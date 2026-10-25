@@ -9,7 +9,7 @@ This project was built by an AI assistant at the account owner's request. Hack C
 ## Decisions
 
 * The brief listed `uio` flags for BUSY, ZERO, OVERFLOW, SIGN and the iteration counter. Only four flags fit beside four control inputs, so the iteration counter is left off the pins. It is visible in the simulator and in the VCD.
-* The brief asked for a 6 bit angle with a Q1.7 atan table. The table is stored in units of pi/64 with 4 fractional bits (9 bit entries), because that keeps the 6 bit operand range at plus or minus 90 degrees. Outputs are Q1.7.
+* The brief asked for a 6 bit angle with a Q1.7 atan table. The table is stored in units of pi/64 with 4 fractional bits (9 bit entries), because that keeps the signed 6 bit operand range at minus 90 to plus 87.2 degrees. Outputs are Q1.7.
 * The brief called opcode 10 a leaky integrator. It is a plain saturating accumulator with gain 1 or 3, so no leak. The name "MAC" is kept because it multiplies by a small constant and adds.
 * The vectoring operation needs two operands but only one 6 bit pin group exists, so x and y are loaded in two START pulses.
 * The brief said "about 320 cells" and "well below a 500 gate limit". Both are wrong. Yosys with generic gates gives 835 cells, and the Tiny Tapeout flow mapped the design to 894 GF180MCU cells covering 19,575 um^2 inside a 51,967 um^2 core, so it does fit one tile. No 500 cell limit was found in any source that was read.
@@ -19,7 +19,7 @@ This project was built by an AI assistant at the account owner's request. Hack C
 
 | Claim | Evidence |
 | --- | --- |
-| Verilog equals the JavaScript twin | `tests/cosim.test.js`, 320,028 cycles, every output and 12 internal values |
+| Verilog equals the JavaScript twin | `tests/cosim.test.js`, 320,028 cycles, both output bytes and 10 internal registers, 12 values per clock |
 | The comparison can fail | Changing `ATAN_Q[3]` in `engine.js`, or the LFSR mask in `project.v`, made both seeds fail |
 | Verilog is right against maths, not only against its twin | `test/test.py` against `math` and a Python CRC-8, 7 of 7 pass under Icarus Verilog 13 and cocotb 2.1.0 |
 | 835 generic cells | `tools/synth_stats.py` (Yosys 0.70), written to `docs/synth-stats.json` |

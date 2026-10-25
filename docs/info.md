@@ -39,7 +39,7 @@ In vectoring mode, the sign of `y` picks the turn direction and the core drives 
 
 | Opcode | Run it | `uo_out` |
 | --- | --- | --- |
-| 00 | Put A on `ui_in[5:0]` and give START a rising edge. A is an angle in units of pi/64, so A = 32 is 90 degrees. | RSEL 0 shows cos, RSEL 1 shows sin, Q1.7 |
+| 00 | Put A on `ui_in[5:0]` and give START a rising edge. A is a signed angle in units of pi/64, from -32 (minus 90 degrees, pin value 0b100000) to 31 (plus 87.2 degrees). | RSEL 0 shows cos, RSEL 1 shows sin, Q1.7 |
 | 01 | START with MODE 0 loads x = A. Then START with MODE 1 loads y = A and runs. | RSEL 0 shows length times 1.6467, RSEL 1 shows the angle in counts of 1/128 of a half turn |
 | 10 | START adds A, or 3A with GAIN3. START with MODE 1 clears. | accumulator |
 | 11 | MODE 0 free runs the LFSR, START loads the seed 01 followed by A. MODE 1 with START feeds A to the CRC, and with RSEL also high it clears the CRC. | LFSR state, or CRC after a feed |

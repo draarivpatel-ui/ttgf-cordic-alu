@@ -242,7 +242,7 @@
         <caption id="ops-caption">The four operations. Operand A is ui_in[5:0], a signed 6 bit value.</caption>
         <thead><tr><th scope="col">ui_in[7:6]</th><th scope="col">Operation</th><th scope="col">How to run it</th><th scope="col">uo_out</th></tr></thead>
         <tbody>
-          <tr><th scope="row"><code>00</code></th><td>Rotate</td><td>A is an angle in units of pi/64 (A = 32 is 90 degrees). Rising edge on START.</td><td>cos in Q1.7. RSEL = 1 shows sin. Saturates at plus 127 and minus 128.</td></tr>
+          <tr><th scope="row"><code>00</code></th><td>Rotate</td><td>A is a signed angle in units of pi/64, from -32 (minus 90 degrees) to 31 (plus 87.2 degrees). Rising edge on START.</td><td>cos in Q1.7. RSEL = 1 shows sin. Saturates at plus 127 and minus 128.</td></tr>
           <tr><th scope="row"><code>01</code></th><td>Vector</td><td>START with MODE 0 loads x = A. START with MODE 1 loads y = A and runs.</td><td>length times 1.6467 (whole number). RSEL = 1 shows the angle, 128 counts per half turn.</td></tr>
           <tr><th scope="row"><code>10</code></th><td>Saturating MAC</td><td>START adds A, or 3A when GAIN3 = 1. START with MODE 1 clears.</td><td>8 bit signed accumulator. OVERFLOW marks a clamped add.</td></tr>
           <tr><th scope="row"><code>11</code></th><td>PRBS and CRC</td><td>MODE 0 free runs a Galois LFSR, START seeds it with 01 and A. MODE 1 with START feeds A to a CRC-8, RSEL = 1 clears it.</td><td>LFSR state, or CRC after a feed.</td></tr>

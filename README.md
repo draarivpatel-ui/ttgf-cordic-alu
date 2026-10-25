@@ -18,7 +18,7 @@ Open `index.html` (or the project page) for an interactive workbench with the in
 | Check | Result |
 | --- | --- |
 | `src/project.v` compiles under Icarus Verilog 13 with `-Wall` | clean |
-| Verilog and `engine.js` compared after every clock edge, all outputs and 12 internal values | identical for 320,028 cycles over two seeds, directed sweeps plus random pins and resets |
+| Verilog and `engine.js` compared after every clock edge, both output bytes and 10 internal registers | identical for 320,028 cycles over two seeds, directed sweeps plus random pins and resets |
 | The comparison detects a one constant change on either side | yes, checked by hand mutation |
 | cocotb tests in `test/test.py` against Python `math` and a Python CRC-8 | 7 of 7 pass under Icarus Verilog |
 | Rotation error against `Math.cos` and `Math.sin`, all 64 angles | worst 1.73 LSB (cos) and 1.45 LSB (sin) |

@@ -10,7 +10,7 @@ Everything below was measured in this repository. Anything not listed was not me
 | --- | --- | --- |
 | CORDIC stages | 8, one per clock | `src/project.v`, `aariv_cordic_core` |
 | Result latency | 8 clocks after the START edge | `tests/engine.test.js`, `test/test.py` |
-| Rotation angle unit | pi/64 per count, A = 32 is 90 degrees | `src/project.v` |
+| Rotation angle unit | pi/64 per count, signed, A = -32 is minus 90 degrees and A = 31 is plus 87.2 degrees | `src/project.v` |
 | Worst cosine error | 1.73 LSB of 1/128 | `E.rotationErrorReport()` over all 64 angles |
 | Worst sine error | 1.45 LSB | same |
 | Worst length error | 1.07 counts | all 4095 nonzero (x, y) pairs |

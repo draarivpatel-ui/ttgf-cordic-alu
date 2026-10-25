@@ -524,3 +524,18 @@ test("pipeline traces keep the pins of their own operation on ui_in for every cy
   assert.ok(r.trace.every((t) => t.uiIn >> 6 === E.OP.ROTATE));
   assert.equal(r.trace[r.trace.length - 1].uiIn & 0x3f, -9 & 0x3f);
 });
+
+test("pin value 32 is the signed angle -32 (minus 90 degrees), and the docs say so", () => {
+  // ui_in[5:0] = 0b100000 is two's complement -32, so it rotates to minus 90 degrees, not plus 90.
+  const c = freshChip();
+  E.stepClock(c, ROT | 32, 0, 1);
+  E.stepClock(c, ROT | 32, 1, 1); // START rising edge with ui_in[5:0] = 32
+  for (let i = 0; i < 10; i++) E.stepClock(c, ROT | 32, 0, 1);
+  assert.equal((E.outputs(c, 4).uoOut << 24) >> 24, -128); // sin(-90 degrees)
+  assert.ok(Math.abs((E.outputs(c, 0).uoOut << 24) >> 24) <= 2); // cos(-90 degrees)
+  for (const f of ["docs/info.md", "WRITEUP.md", "index.html"]) {
+    const text = fs.readFileSync(path.join(root, f), "utf8");
+    assert.ok(!/A = 32 is 90/.test(text), `${f} must not call A = 32 plus 90 degrees`);
+    assert.ok(/87\.2 degrees/.test(text), `${f} gives the top of the range, 87.2 degrees`);
+  }
+});
