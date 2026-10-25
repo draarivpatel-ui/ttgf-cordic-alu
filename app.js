@@ -190,18 +190,20 @@
       if (!svg) return;
       let g = '<rect class="chip-body" x="150" y="70" width="220" height="250" rx="4"/>';
       g += '<text class="chip-label" x="260" y="190" text-anchor="middle">tt_um_aariv</text><text class="chip-label" x="260" y="208" text-anchor="middle">_cordic_alu</text><text class="chip-label dim" x="260" y="232" text-anchor="middle">340 x 160 um tile</text>';
-      const pin = (kind, i, x, y, w, h, label, role, lx, ly, anchor, rot) => {
+      // zone is an invisible tap area over the pin's whole slot, label included: on a phone the pin
+      // itself is about 13 by 8 px, the slot about 65 by 17 px (side pins) or 13 by 53 px (bottom)
+      const pin = (kind, i, x, y, w, h, label, role, lx, ly, anchor, rot, zone) => {
         const lab = `${label}[${i}]`;
-        return `<g class="pin" tabindex="0" role="button" data-kind="${kind}" data-i="${i}" data-label="${lab}" data-role="${role}" aria-label="${lab}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2"/><text x="${lx}" y="${ly}" text-anchor="${anchor}"${rot ? ` transform="rotate(-90 ${lx} ${ly})"` : ""}>${lab}</text></g>`;
+        return `<g class="pin" tabindex="0" role="button" data-kind="${kind}" data-i="${i}" data-label="${lab}" data-role="${role}" aria-label="${lab}"><rect class="tap-zone" x="${zone[0]}" y="${zone[1]}" width="${zone[2]}" height="${zone[3]}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2"/><text x="${lx}" y="${ly}" text-anchor="${anchor}"${rot ? ` transform="rotate(-90 ${lx} ${ly})"` : ""}>${lab}</text></g>`;
       };
       for (let i = 0; i < 8; i++) {
         const b = 7 - i;
-        g += pin("ui", b, 128, 92 + i * 28, 22, 14, "ui_in", PIN_ROLES.ui[b], 120, 103 + i * 28, "end", false);
-        g += pin("uo", b, 370, 92 + i * 28, 22, 14, "uo_out", PIN_ROLES.uo[b], 400, 103 + i * 28, "start", false);
-        g += pin("uio", b, 168 + i * 22, 320, 14, 22, "uio", PIN_ROLES.uio[b], 180 + i * 22, 400, "start", true);
+        g += pin("ui", b, 128, 92 + i * 28, 22, 14, "ui_in", PIN_ROLES.ui[b], 120, 103 + i * 28, "end", false, [30, 85 + i * 28, 120, 28]);
+        g += pin("uo", b, 370, 92 + i * 28, 22, 14, "uo_out", PIN_ROLES.uo[b], 400, 103 + i * 28, "start", false, [370, 85 + i * 28, 120, 28]);
+        g += pin("uio", b, 168 + i * 22, 320, 14, 22, "uio", PIN_ROLES.uio[b], 180 + i * 22, 400, "start", true, [164 + i * 22, 320, 22, 90]);
       }
       ["clk", "rst_n", "ena"].forEach((n, k) => {
-        g += `<g class="pin" tabindex="-1" data-kind="misc" data-label="${n}" data-role="${n === "clk" ? "clock" : n === "rst_n" ? "reset, active low" : "enable, high while powered"}"><rect x="${190 + k * 52}" y="48" width="14" height="22" rx="2"/><text x="${197 + k * 52}" y="40" text-anchor="middle">${n}</text></g>`;
+        g += `<g class="pin" tabindex="-1" data-kind="misc" data-label="${n}" data-role="${n === "clk" ? "clock" : n === "rst_n" ? "reset, active low" : "enable, high while powered"}"><rect class="tap-zone" x="${171 + k * 52}" y="24" width="52" height="46"/><rect x="${190 + k * 52}" y="48" width="14" height="22" rx="2"/><text x="${197 + k * 52}" y="40" text-anchor="middle">${n}</text></g>`;
       });
       svg.innerHTML = g;
       const rows = $("pin-rows");
@@ -212,19 +214,41 @@
         for (let b = 7; b >= 0; b--) h += `<tr><th scope="row"><code>uio[${b}]</code></th><td>${b < 4 ? "input" : "output"}</td><td>${PIN_ROLES.uio[b]}</td></tr>`;
         rows.innerHTML = h;
       }
-      Array.prototype.forEach.call(svg.querySelectorAll(".pin"), (el) => {
-        const act = () => {
-          const kind = el.getAttribute("data-kind");
-          const label = el.getAttribute("data-label");
-          S.selectedPin = label;
-          const i = Number(el.getAttribute("data-i"));
-          let msg = `${label}. ${el.getAttribute("data-role")}.`;
-          if (kind === "ui" || (kind === "uio" && i < 4)) { toggleBit(kind, i); msg += " Toggled."; }
-          text("pin-info", msg);
-          renderPinout();
-        };
-        el.addEventListener("click", act);
-        el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(); } });
+      const pins = Array.prototype.slice.call(svg.querySelectorAll(".pin"));
+      // stepping order follows the pin roles table, then the three system pins
+      const rank = { ui: 0, uo: 1, uio: 2, misc: 3 };
+      const order = pins.slice().sort((a, b) => {
+        const ka = rank[a.getAttribute("data-kind")], kb = rank[b.getAttribute("data-kind")];
+        return ka !== kb ? ka - kb : Number(b.getAttribute("data-i")) - Number(a.getAttribute("data-i"));
+      });
+      // toggle is false when inspecting with the step buttons or arrow keys
+      const selectPin = (el, toggle) => {
+        const kind = el.getAttribute("data-kind");
+        const label = el.getAttribute("data-label");
+        S.selectedPin = label;
+        const i = Number(el.getAttribute("data-i"));
+        let msg = `${label}. ${el.getAttribute("data-role")}.`;
+        if (toggle && (kind === "ui" || (kind === "uio" && i < 4))) { toggleBit(kind, i); msg += " Toggled."; }
+        text("pin-info", msg);
+        renderPinout();
+      };
+      const step = (dir, focus) => {
+        const at = order.findIndex((el) => el.getAttribute("data-label") === S.selectedPin);
+        const next = order[at < 0 ? (dir > 0 ? 0 : order.length - 1) : (at + dir + order.length) % order.length];
+        selectPin(next, false);
+        if (focus && next.focus) next.focus();
+      };
+      pins.forEach((el) => {
+        el.addEventListener("click", () => selectPin(el, true));
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectPin(el, true); }
+          else if (e.key === "ArrowDown" || e.key === "ArrowRight") { e.preventDefault(); step(1, true); }
+          else if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); step(-1, true); }
+        });
+      });
+      [["pin-prev", -1], ["pin-next", 1]].forEach(([id, dir]) => {
+        const b = $(id);
+        if (b) b.addEventListener("click", () => step(dir, false));
       });
     }
 

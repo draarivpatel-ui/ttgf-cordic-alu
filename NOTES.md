@@ -33,4 +33,4 @@ This project was built by an AI assistant at the account owner's request. Hack C
 3. The account owner would need to write the Hack Club write up from `WRITEUP.md` and run the design on an FPGA before any submission, and decide first whether an AI assisted design is allowed.
 4. No timing report was read. `clock_hz: 1000000` is a cautious placeholder.
 5. Vectors shorter than 4 units are imprecise (about 6 counts of angle error) because x and y keep only 3 fractional bits there.
-6. The page loads three Google fonts from `fonts.googleapis.com`. Self host them if a privacy rule needs it.
+6. Fonts are self hosted (`fonts.css`, `fonts/`, Latin subsets, OFL notes in `fonts/LICENSES.txt`); the page makes no request to a font service.

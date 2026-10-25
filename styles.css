@@ -237,7 +237,11 @@ table.spec { border-collapse: collapse; width: 100%; font-size: var(--text-sm); 
 .fp-block text.big { font-size: 9px; font-weight: 600; }
 .fp-tile { fill: none; stroke: var(--ink); stroke-width: 1.5; }
 .fp-ring { fill: none; stroke: var(--copper); stroke-width: 0.8; stroke-dasharray: 3 2; }
-.pin { cursor: pointer; }
+.pin, #pinout-svg { cursor: pointer; }
+#pinout-svg { touch-action: manipulation; }
+.pin rect.tap-zone, .pin.hi rect.tap-zone, .pin.sel rect.tap-zone, .pin:focus-visible rect.tap-zone { fill: transparent; stroke: none; }
+.pin-step { display: flex; gap: var(--space-sm); margin-top: var(--space-sm); }
+.pin-step .btn { flex: 1 1 0; }
 .pin circle, .pin rect { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; transition: fill var(--dur-fast) var(--ease-out); }
 .pin.hi circle, .pin.hi rect { fill: var(--green); }
 .pin.sel circle, .pin.sel rect { stroke: var(--copper); stroke-width: 3; }

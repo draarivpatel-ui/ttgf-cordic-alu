@@ -443,3 +443,38 @@ test("src/config.json from the Tiny Tapeout template is present and parses (the 
   assert.equal(cfg.CLOCK_PORT, "clk");
   assert.ok(cfg.CLOCK_PERIOD > 0);
 });
+
+test("Previous and Next pin step through the pinout in table order without toggling", () => {
+  const env = makeEnv();
+  env.byId["pin-next"].click();
+  assert.match(env.byId["pin-info"].textContent, /^ui_in\[7\]\. opcode bit 1\.$/);
+  env.byId["pin-next"].click();
+  assert.match(env.byId["pin-info"].textContent, /^ui_in\[6\]\./);
+  assert.equal(env.state.ui, 0, "stepping never toggles an input");
+  env.byId["pin-prev"].click();
+  env.byId["pin-prev"].click();
+  assert.match(env.byId["pin-info"].textContent, /^ena\./, "wraps from the first pin to the last");
+  for (let i = 0; i < 9; i++) env.byId["pin-next"].click();
+  assert.match(env.byId["pin-info"].textContent, /^uo_out\[7\]\./);
+});
+
+test("arrow keys on a pin move to the neighbouring pin", () => {
+  const env = makeEnv();
+  const pin = env.byId["pinout-svg"].children.find((e) => e.attrs["data-label"] === "uo_out[3]");
+  pin.dispatch("click");
+  pin.dispatch("keydown", { key: "ArrowDown", preventDefault() {} });
+  assert.match(env.byId["pin-info"].textContent, /^uo_out\[2\]\./);
+});
+
+test("every pin has a tap zone over its whole slot, and the step buttons are in the page", () => {
+  const env = makeEnv();
+  const kids = env.byId["pinout-svg"].children;
+  const zones = kids.filter((e) => e.attrs.class === "tap-zone");
+  assert.equal(zones.length, 27);
+  // side pin slots are a full 28 unit pitch tall and cover the label; bottom slots a full 22 unit pitch wide
+  assert.equal(zones.filter((z) => z.attrs.height === "28" && Number(z.attrs.width) >= 110).length, 16);
+  assert.equal(zones.filter((z) => z.attrs.width === "22" && Number(z.attrs.height) >= 80).length, 8);
+  assert.match(css, /\.pin rect\.tap-zone[^{]*\{ fill: transparent; stroke: none; \}/);
+  assert.match(html, /id="pin-prev"[^>]*>|<button[^>]*id="pin-prev"/);
+  assert.match(css, /\.pin-step \.btn \{ flex: 1 1 0; \}/);
+});

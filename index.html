@@ -6,9 +6,7 @@
   <title>tt_um_aariv_cordic_alu | CORDIC and fixed-point tile, simulated in your browser</title>
   <meta name="description" content="A multiplier-free CORDIC and fixed-point ALU tile for Tiny Tapeout GF180MCU, with a bit-exact cycle simulator, logic analyzer waveforms and a unit circle view.">
   <meta name="theme-color" content="#F6F4EE">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="fonts.css">
   <link rel="stylesheet" href="styles.css">
   <meta property="og:title" content="tt_um_aariv_cordic_alu | CORDIC and fixed-point tile, simulated in your browser">
   <meta property="og:description" content="A multiplier-free CORDIC and fixed-point ALU tile for Tiny Tapeout GF180MCU, with a bit-exact cycle simulator, logic analyzer waveforms and a unit circle view.">
@@ -304,7 +302,11 @@
     <div class="po-grid">
       <figure class="chip-fig">
         <svg id="pinout-svg" viewBox="0 0 520 410" role="group" aria-label="Pinout of the tile, live state"></svg>
-        <figcaption id="pin-info">Select a pin.</figcaption>
+        <figcaption id="pin-info" aria-live="polite">Select a pin, or step through them.</figcaption>
+        <div class="pin-step">
+          <button type="button" class="btn" id="pin-prev">Previous pin</button>
+          <button type="button" class="btn" id="pin-next">Next pin</button>
+        </div>
       </figure>
       <div class="table-wrap">
         <table class="spec">
