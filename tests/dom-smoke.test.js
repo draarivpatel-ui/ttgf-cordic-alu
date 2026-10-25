@@ -437,3 +437,9 @@ test("the OVERFLOW LED lights after a clamped MAC add", () => {
   env.state.uio = 8; env.byId["btn-step"].click();
   assert.equal(env.byId["f-ovf"].getAttribute("class"), "on warn");
 });
+
+test("src/config.json from the Tiny Tapeout template is present and parses (the gds job needs it)", () => {
+  const cfg = JSON.parse(read("src/config.json"));
+  assert.equal(cfg.CLOCK_PORT, "clk");
+  assert.ok(cfg.CLOCK_PERIOD > 0);
+});
