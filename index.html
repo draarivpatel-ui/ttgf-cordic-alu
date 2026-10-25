@@ -273,7 +273,7 @@
         </table>
       </div>
     </div>
-    <p class="hint">Whether the design fits one tile after GF180MCU mapping, placement and routing is unverified until the Tiny Tapeout GDS workflow has run. The cell library is different from the generic one used here, so the real cell count will differ from 835.</p>
+    <p class="hint">The Tiny Tapeout GDS workflow mapped the design to 894 GF180MCU cells with 19,575 square micrometres of cell area, inside a core of 51,967 square micrometres, so it does fit one tile. The rectangles above use the generic counts from the table, so they show relative size only.</p>
   </section>
 
   <section class="band" id="pinout" aria-labelledby="po-title">
@@ -308,14 +308,15 @@
           <li>A replay bench runs the Verilog and this page's JavaScript twin through the same stimulus. Every output and every internal register matched after every clock edge for <span data-fill="cosim">320,028</span> cycles, over two random seeds plus directed sweeps of every operation.</li>
           <li>The comparison was shown to fail when either side is changed by one constant, so a pass means something.</li>
           <li>Accuracy limits above are asserted by the test suite, not only displayed.</li>
+          <li>The Tiny Tapeout GDS workflow built the layout in GF180MCU cells, the precheck reported 0 DRC violations and the gate-level test passed.</li>
         </ul>
       </article>
       <article class="panel">
         <h3>Not done</h3>
         <ul class="plain">
-          <li>No tapeout. No GF180MCU place and route has been run, so the tile fit and the real standard cell count are unknown.</li>
+          <li>No tapeout, and no person has reviewed the layout image. The workflow's own Pages viewer job fails because this site is served from the main branch.</li>
           <li>No test on an FPGA or with a logic analyzer. The plan is to load the Verilog on an FPGA board, wire ui_in and uio_in to switches, and capture uo_out and uio_out on a logic analyzer while stepping through the four operations in the table above.</li>
-          <li>The Tiny Tapeout GitHub workflows (test, gds, docs, fpga) have not run yet, because the repository has not been pushed. The cocotb tests in <code>test/test.py</code> pass locally under Icarus Verilog, and they check against <code>math</code> rather than the JavaScript twin.</li>
+          <li>The <code>fpga</code> workflow was not checked. The cocotb tests in <code>test/test.py</code> pass under Icarus Verilog, locally and in the <code>test</code> workflow, and they check against <code>math</code> rather than the JavaScript twin.</li>
           <li>No write up has been published. <code>WRITEUP.md</code> only collects measured facts for a person to write from.</li>
         </ul>
       </article>

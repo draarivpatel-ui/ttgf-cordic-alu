@@ -25,14 +25,17 @@ Open `index.html` (or the project page) for an interactive workbench with the in
 | Vectoring error, all 4095 nonzero inputs | length within 1.07 counts, angle within 1.15 counts at length 8 or more, up to 6 below length 4 |
 | CRC-8 check string `123456789` | 0xF4, the standard value for polynomial 0x07 |
 | CRC-8 of the bytes 0 to 63, used as a built in self test signature | 0x8E |
-| Yosys 0.70 generic gate count | 835 cells, 75 of them flip-flops |
+| Yosys 0.70 generic gate count (`tools/synth_stats.py`) | 835 cells, 75 of them flip-flops |
+| Tiny Tapeout `gds` workflow on GitHub (LibreLane, GF180MCU 7 track library, run 40216982627) | built. Mapped to 894 standard cells (75 `dffq_1`) with a synthesized area of 19,575 um^2, 24 percent of it flip-flops, inside a core of 51,967 um^2. Magic and routing DRC reported clear |
+| `precheck` and `gl_test` jobs in the same run | both succeeded, precheck DRC reported 0 violations, the gate-level test passed |
+| `test` workflow on GitHub (cocotb under Icarus Verilog) | succeeded |
 
 ## What is not verified
 
-* GF180MCU mapping, placement and routing. The 835 figure uses generic gates and is not a standard cell count, so whether the design fits one 340 by 160 micrometre tile is unknown until the Tiny Tapeout GDS workflow runs.
-* The four template GitHub workflows (`test`, `gds`, `docs`, `fpga`) have not run, because this repository has not been pushed.
+* The `viewer` job of the Tiny Tapeout `gds` workflow fails. It wants to deploy to GitHub Pages through Actions, and this repository serves Pages from the `main` branch so the workbench stays online. The layout itself built and passed the checks above.
+* The `fpga` workflow has not been read or confirmed, and no layout image has been reviewed by a person.
 * No FPGA or logic analyzer run.
-* No timing analysis. `clock_hz` in `info.yaml` is a conservative choice, not a measured limit.
+* No timing report has been read. `clock_hz` in `info.yaml` is a conservative choice (the template's own clock period is 20 ns), not a measured limit.
 
 ## Run the checks
 

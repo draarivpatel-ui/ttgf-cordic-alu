@@ -17,6 +17,7 @@ Everything below was measured in this repository. Anything not listed was not me
 | Worst angle error | 1.15 counts (1 count is 1.40625 degrees), vectors of length 8 or more | same |
 | Angle error for vectors shorter than 4 | up to 6 counts | same |
 | Generic gate count | 835 cells, 75 flip-flops | `docs/synth-stats.json`, Yosys 0.70 |
+| GF180MCU cells after mapping | 894 cells, 75 of them `dffq_1`, 19,575 um^2 of cell area (24 percent flip-flops) in a 51,967 um^2 core | Tiny Tapeout `gds` run 40216982627 on GitHub, synthesis step log |
 | Cells per block | core 454, top level 240, MAC 92, PRBS and CRC 49 | same |
 | LFSR period | 255 | `tests/engine.test.js`, `test/test.py` |
 | CRC-8 check value for `123456789` | 0xF4 | `tests/engine.test.js` |
@@ -25,7 +26,7 @@ Everything below was measured in this repository. Anything not listed was not me
 
 ## Not measured
 
-Standard cell count after GF180MCU mapping, tile utilisation, timing, power, and anything on real hardware. Do not write any of these as facts until they are measured.
+Final utilisation after routing, timing slack, power, and anything on real hardware. Do not write any of these as facts until they are measured.
 
 ## Questions a write up should answer, in the author's own words
 
