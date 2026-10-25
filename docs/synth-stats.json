@@ -1,0 +1,30 @@
+{
+  "tool": "yosys 0.70+post",
+  "mapping": "generic gates (AND NAND OR NOR XOR XNOR MUX NOT) + flip-flops, not GF180MCU",
+  "top": "tt_um_aariv_cordic_alu",
+  "total_cells": 835,
+  "total_flipflops": 75,
+  "total_logic": 760,
+  "modules": {
+    "tt_um_aariv_cordic_alu": {
+      "cells": 240,
+      "flipflops": 11,
+      "logic": 229
+    },
+    "aariv_prng_crc": {
+      "cells": 49,
+      "flipflops": 16,
+      "logic": 33
+    },
+    "aariv_mac8": {
+      "cells": 92,
+      "flipflops": 9,
+      "logic": 83
+    },
+    "aariv_cordic_core": {
+      "cells": 454,
+      "flipflops": 39,
+      "logic": 415
+    }
+  }
+}

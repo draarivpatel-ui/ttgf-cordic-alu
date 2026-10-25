@@ -1,0 +1,10 @@
+{
+  "name": "ttgf-cordic-alu",
+  "version": "0.1.0",
+  "description": "Multiplier-free CORDIC and fixed-point ALU tile for Tiny Tapeout GF180MCU, with a cycle accurate JavaScript twin and a browser workbench. AI assisted reference design.",
+  "private": true,
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
+}

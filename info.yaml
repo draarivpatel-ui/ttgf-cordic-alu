@@ -1,0 +1,49 @@
+# Tiny Tapeout project information
+project:
+  title:        "CORDIC and fixed-point ALU (AI assisted reference design)"
+  author:       "draarivpatel-ui"
+  discord:      ""
+  description:  "AI assisted reference design, not a Hack Club ASIC entry. 8 stage multiplier-free CORDIC (sin/cos, atan2/length), saturating MAC, LFSR and CRC-8."
+  language:     "Verilog"
+  clock_hz:     1000000
+
+  tiles: "1x1"
+
+  top_module:  "tt_um_aariv_cordic_alu"
+
+  source_files:
+    - "project.v"
+
+pinout:
+  # Inputs
+  ui[0]: "A0, operand bit 0"
+  ui[1]: "A1"
+  ui[2]: "A2"
+  ui[3]: "A3"
+  ui[4]: "A4"
+  ui[5]: "A5, operand sign bit"
+  ui[6]: "opcode bit 0"
+  ui[7]: "opcode bit 1"
+
+  # Outputs
+  uo[0]: "result bit 0"
+  uo[1]: "result bit 1"
+  uo[2]: "result bit 2"
+  uo[3]: "result bit 3"
+  uo[4]: "result bit 4"
+  uo[5]: "result bit 5"
+  uo[6]: "result bit 6"
+  uo[7]: "result bit 7, sign of a signed result"
+
+  # Bidirectional pins
+  uio[0]: "START, rising edge runs the operation (input)"
+  uio[1]: "MODE, selects the second form of an operation (input)"
+  uio[2]: "RSEL, shows the second result on uo_out (input)"
+  uio[3]: "GAIN3, MAC gain of 3 instead of 1 (input)"
+  uio[4]: "BUSY (output)"
+  uio[5]: "ZERO (output)"
+  uio[6]: "OVERFLOW (output)"
+  uio[7]: "SIGN (output)"
+
+# Do not change!
+yaml_version: 6

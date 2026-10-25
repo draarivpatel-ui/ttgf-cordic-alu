@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tt_um_aariv_cordic_alu | CORDIC and fixed-point tile, simulated in your browser</title>
+  <meta name="description" content="A multiplier-free CORDIC and fixed-point ALU tile for Tiny Tapeout GF180MCU, with a bit-exact cycle simulator, logic analyzer waveforms and a unit circle view.">
+  <meta name="theme-color" content="#F6F4EE">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#workbench">Skip to the workbench</a>
+
+<header class="bar">
+  <a class="mark" href="#top" aria-label="tt_um_aariv_cordic_alu, back to top">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M2 9h2M2 15h2M20 9h2M20 15h2M9 2v2M15 2v2M9 20v2M15 20v2" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+    <span>cordic_alu</span>
+  </a>
+  <nav aria-label="Sections">
+    <a href="#workbench">Workbench</a>
+    <a href="#datapath">Datapath</a>
+    <a href="#floorplan">Floorplan</a>
+    <a href="#pinout">Pinout</a>
+    <a href="#verification">Verification</a>
+  </nav>
+  <a class="bar-link" href="https://github.com/draarivpatel-ui/ttgf-cordic-alu" rel="noopener">Source
+    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+  </a>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <h1 id="hero-title">Sine, cosine and angles from nothing but shifts and adds.</h1>
+      <p class="lead"><code>tt_um_aariv_cordic_alu</code> is a small Tiny Tapeout design for the GF180MCU shuttle. One eight clock CORDIC engine rotates and measures vectors. Next to it sit a saturating accumulator and a pseudo random generator with a CRC. This page runs the same logic in your browser, one clock edge at a time.</p>
+      <div class="notice" id="disclosure" role="note">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <p><strong>Status.</strong> This is an AI assisted reference design. Hack Club ASIC does not accept AI written chip code or write ups, so it is not an eligible entry for that program. It has not been taped out and it has not been run on hardware.</p>
+      </div>
+      <dl class="stats">
+        <div><dt>Generic gates after Yosys</dt><dd><span data-fill="cells">835</span></dd></div>
+        <div><dt>Clocks per CORDIC result</dt><dd>8</dd></div>
+        <div><dt>Hardware multipliers</dt><dd>0</dd></div>
+        <div><dt>Clock cycles checked against Verilog</dt><dd><span data-fill="cosim">320,028</span></dd></div>
+      </dl>
+    </div>
+    <figure class="hero-fig">
+      <svg id="hero-svg" viewBox="-1.4 -1.4 2.8 2.8" role="img" aria-labelledby="hero-svg-title">
+        <title id="hero-svg-title">A vector rotating around the unit circle in eight CORDIC steps</title>
+        <g class="grid-lines"><line x1="-1.3" y1="0" x2="1.3" y2="0"/><line x1="0" y1="-1.3" x2="0" y2="1.3"/></g>
+        <circle class="unit" cx="0" cy="0" r="1"/>
+        <circle class="unit-inner" cx="0" cy="0" r="0.6073"/>
+        <line id="h-target" class="target" x1="0" y1="0" x2="1" y2="0"/>
+        <g id="h-trail" class="trail"></g>
+        <line id="h-vec" class="vec" x1="0" y1="0" x2="0.6" y2="0"/>
+        <circle id="h-dot" class="dot" cx="0.6" cy="0" r="0.045"/>
+      </svg>
+      <figcaption id="h-readout" aria-live="off">Stage 0 of 8</figcaption>
+    </figure>
+  </section>
+
+  <section class="band" id="workbench" aria-labelledby="wb-title">
+    <div class="band-head">
+      <h2 id="wb-title">Workbench</h2>
+      <p>Flip the input switches, pulse START and step the clock. Everything below is computed by the JavaScript twin of the Verilog, register for register.</p>
+    </div>
+
+    <div class="wb-grid">
+      <section class="panel" aria-labelledby="pins-title">
+        <h3 id="pins-title">Input pins</h3>
+        <p class="hint">ui_in selects the opcode (bits 7 and 6) and a signed 6 bit operand A (bits 5 to 0).</p>
+        <div class="dips" id="ui-switches" role="group" aria-label="ui_in switches">
+          <button type="button" class="dip" data-bus="ui" data-bit="7" aria-pressed="false"><span class="dip-name">ui_in[7]</span><span class="dip-role">op1</span><span class="dip-val">0</span></button>
+          <button type="button" class="dip" data-bus="ui" data-bit="6" aria-pressed="false"><span class="dip-name">ui_in[6]</span><span class="dip-role">op0</span><span class="dip-val">0</span></button>
+          <button type="button" class="dip" data-bus="ui" data-bit="5" aria-pressed="false"><span class="dip-name">ui_in[5]</span><span class="dip-role">A sign</span><span class="dip-val">0</span></button>
+          <button type="button" class="dip" data-bus="ui" data-bit="4" aria-pressed="false"><span class="dip-name">ui_in[4]</span><span class="dip-role">A4</span><span class="dip-val">0</span></button>
+          <button type="button" class="dip" data-bus="ui" data-bit="3" aria-pressed="false"><span class="dip-name">ui_in[3]</span><span class="dip-role">A3</span><span class="dip-val">0</span></button>
+          <button type="button" class="dip" data-bus="ui" data-bit="2" aria-pressed="false"><span class="dip-name">ui_in[2]</span><span class="dip-role">A2</span><span class="dip-val">0</span></button>
+          <button type="button" class="dip" data-bus="ui" data-bit="1" aria-pressed="false"><span class="dip-name">ui_in[1]</span><span class="dip-role">A1</span><span class="dip-val">0</span></button>
+          <button type="button" class="dip" data-bus="ui" data-bit="0" aria-pressed="false"><span class="dip-name">ui_in[0]</span><span class="dip-role">A0</span><span class="dip-val">0</span></button>
+        </div>
+        <p class="hint">uio_in[3:0] are control inputs. uio_in[7:4] are outputs, so they have no switch.</p>
+        <div class="dips dips-4" id="uio-switches" role="group" aria-label="uio_in switches">
+          <button type="button" class="dip" data-bus="uio" data-bit="3" aria-pressed="false"><span class="dip-name">uio_in[3]</span><span class="dip-role">GAIN3</span><span class="dip-val">0</span></button>
+          <button type="button" class="dip" data-bus="uio" data-bit="2" aria-pressed="false"><span class="dip-name">uio_in[2]</span><span class="dip-role">RSEL</span><span class="dip-val">0</span></button>
+          <button type="button" class="dip" data-bus="uio" data-bit="1" aria-pressed="false"><span class="dip-name">uio_in[1]</span><span class="dip-role">MODE</span><span class="dip-val">0</span></button>
+          <button type="button" class="dip" data-bus="uio" data-bit="0" aria-pressed="false"><span class="dip-name">uio_in[0]</span><span class="dip-role">START</span><span class="dip-val">0</span></button>
+        </div>
+        <div class="dips dips-1">
+          <button type="button" class="dip" id="dip-rstn" aria-pressed="true"><span class="dip-name">rst_n</span><span class="dip-role">reset, active low</span><span class="dip-val">1</span></button>
+        </div>
+        <p class="decoded" id="pin-decode">opcode 00 rotate, A = 0</p>
+      </section>
+
+      <section class="panel" aria-labelledby="clk-title">
+        <h3 id="clk-title">Clock</h3>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" id="btn-step">Step one clock</button>
+          <button type="button" class="btn" id="btn-run" aria-pressed="false">Run clock</button>
+          <button type="button" class="btn" id="btn-start">Pulse START</button>
+          <button type="button" class="btn" id="btn-reset">Reset chip</button>
+        </div>
+        <label class="range" for="speed">Run speed <output id="speed-out" for="speed">4 Hz</output></label>
+        <input id="speed" type="range" min="1" max="60" value="4" step="1">
+        <h3 class="sub" id="presets-title">Try one</h3>
+        <div class="btn-row" id="presets" role="group" aria-labelledby="presets-title">
+          <button type="button" class="btn" data-preset="rot30">Rotate by about 31 degrees</button>
+          <button type="button" class="btn" data-preset="rot-45">Rotate by minus 45 degrees</button>
+          <button type="button" class="btn" data-preset="vec">Angle of (12, 9)</button>
+          <button type="button" class="btn" data-preset="vec-neg">Angle of (minus 10, 10)</button>
+          <button type="button" class="btn" data-preset="mac">Accumulate with gain 3</button>
+          <button type="button" class="btn" data-preset="prng">Random bit stream</button>
+        </div>
+        <p class="decoded" id="cycle-line">Clock cycle 0</p>
+      </section>
+
+      <section class="panel panel-circle" aria-labelledby="circle-title">
+        <h3 id="circle-title">Unit circle</h3>
+        <figure class="circle-fig">
+          <svg id="circle" viewBox="-1.4 -1.4 2.8 2.8" role="img" aria-labelledby="circle-svg-title">
+            <title id="circle-svg-title">CORDIC vector position on the unit circle</title>
+            <g class="grid-lines"><line x1="-1.3" y1="0" x2="1.3" y2="0"/><line x1="0" y1="-1.3" x2="0" y2="1.3"/></g>
+            <circle class="unit" cx="0" cy="0" r="1"/>
+            <circle class="unit-inner" cx="0" cy="0" r="0.6073"/>
+            <line id="c-target" class="target" x1="0" y1="0" x2="1" y2="0"/>
+            <g id="c-trail" class="trail"></g>
+            <line id="c-vec" class="vec" x1="0" y1="0" x2="0.6" y2="0"/>
+            <circle id="c-dot" class="dot" cx="0.6" cy="0" r="0.045"/>
+          </svg>
+          <figcaption id="circle-caption">Idle. Pulse START in rotate or vector mode to see the eight micro-rotations.</figcaption>
+        </figure>
+        <ol class="stages" id="stage-list" aria-label="Micro-rotation stages"></ol>
+      </section>
+    </div>
+
+    <section class="panel wide" aria-labelledby="wave-title">
+      <div class="panel-head">
+        <h3 id="wave-title">Logic analyzer</h3>
+        <a class="btn btn-small" id="btn-vcd" href="#workbench" download="cordic_alu.vcd" role="button">Download VCD</a>
+      </div>
+      <div class="wave-wrap" tabindex="0" role="region" aria-label="Logic analyzer waveforms, scrollable"><canvas id="wave" width="1100" height="420" role="img" aria-label="Digital waveforms of clk, rst_n, ui_in, uio_in, uo_out, uio_out, x_reg, y_reg, z_reg and the iteration counter"></canvas></div>
+      <p class="hint" id="wave-caption">The newest clock cycle is on the right. Values are hexadecimal; x_reg and y_reg are 11 bit two's complement, z_reg is 12 bit.</p>
+    </section>
+
+    <div class="wb-grid wb-grid-2">
+      <section class="panel" aria-labelledby="regs-title">
+        <h3 id="regs-title">Registers and outputs</h3>
+        <dl class="regs">
+          <div><dt>x_reg</dt><dd id="r-x">000</dd></div>
+          <div><dt>y_reg</dt><dd id="r-y">000</dd></div>
+          <div><dt>z_reg</dt><dd id="r-z">000</dd></div>
+          <div><dt>iter</dt><dd id="r-iter">0</dd></div>
+          <div><dt>acc</dt><dd id="r-acc">00</dd></div>
+          <div><dt>lfsr</dt><dd id="r-lfsr">01</dd></div>
+          <div><dt>crc</dt><dd id="r-crc">00</dd></div>
+          <div><dt>view</dt><dd id="r-view">mac</dd></div>
+          <div><dt>uo_out</dt><dd id="r-uo">00</dd></div>
+          <div><dt>uio_out</dt><dd id="r-uio">20</dd></div>
+        </dl>
+        <ul class="flags" aria-label="Status flags">
+          <li id="f-busy"><span class="led" aria-hidden="true"></span>BUSY</li>
+          <li id="f-zero"><span class="led" aria-hidden="true"></span>ZERO</li>
+          <li id="f-ovf"><span class="led" aria-hidden="true"></span>OVERFLOW</li>
+          <li id="f-sign"><span class="led" aria-hidden="true"></span>SIGN</li>
+        </ul>
+      </section>
+      <section class="panel" aria-labelledby="decode-title">
+        <h3 id="decode-title">What the numbers mean</h3>
+        <p class="decoded big" id="decode">Reset state. The accumulator is zero.</p>
+        <p class="hint" id="decode-ref"></p>
+      </section>
+    </div>
+  </section>
+
+  <section class="band" id="datapath" aria-labelledby="dp-title">
+    <div class="band-head">
+      <h2 id="dp-title">How the datapath works</h2>
+      <p>CORDIC turns a rotation into a staircase of tiny, fixed turns. Each turn is a shift and an add, so the chip never needs a multiplier.</p>
+    </div>
+    <div class="dp-grid">
+      <article class="prose">
+        <p>The engine keeps three registers. <code>x</code> and <code>y</code> hold a vector, and <code>z</code> holds the angle still left to turn. On stage <var>i</var> the vector turns by plus or minus <code>atan(2^-i)</code>. A turn of that size equals <code>x</code> shifted right by <var>i</var> bits, added to or taken from <code>y</code>, and the other way round for <code>x</code>. A small lookup table holds the eight angles.</p>
+        <p>In rotation mode the sign of <code>z</code> picks the turn direction, and <code>z</code> shrinks toward zero. Starting from <code>x = 0.607</code> cancels the length growth of 1.6467 that the eight turns add, so the result is cosine in <code>x</code> and sine in <code>y</code>.</p>
+        <p>In vectoring mode the sign of <code>y</code> picks the direction and the engine drives <code>y</code> to zero. Then <code>z</code> holds the angle of the input and <code>x</code> holds its length times 1.6467. A vector in the left half plane is first turned by 90 degrees so the loop converges.</p>
+      </article>
+      <figure class="diagram">
+        <svg viewBox="0 0 560 340" role="img" aria-labelledby="dp-svg-title" id="dp-svg">
+          <title id="dp-svg-title">One CORDIC stage. Registers x, y and z feed three add or subtract units. The x and y units also take each other's value shifted right by i, and the z unit takes the angle table entry.</title>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" class="arrow-head"/></marker>
+          </defs>
+          <g class="d-wire">
+            <path d="M92 60H206" marker-end="url(#arrow)"/>
+            <path d="M92 160H206" marker-end="url(#arrow)"/>
+            <path d="M92 260H206" marker-end="url(#arrow)"/>
+            <path d="M386 60H452" marker-end="url(#arrow)"/>
+            <path d="M386 160H452" marker-end="url(#arrow)"/>
+            <path d="M386 260H452" marker-end="url(#arrow)"/>
+            <path d="M296 322V288" marker-end="url(#arrow)"/>
+          </g>
+          <g class="d-shift-wire">
+            <path d="M130 160 250 84" marker-end="url(#arrow)"/>
+            <path d="M130 60 250 136" marker-end="url(#arrow)"/>
+          </g>
+          <g class="d-box d-reg"><rect x="48" y="38" width="44" height="44"/><rect x="48" y="138" width="44" height="44"/><rect x="48" y="238" width="44" height="44"/></g>
+          <g class="d-box d-add"><rect x="206" y="35" width="180" height="50"/><rect x="206" y="135" width="180" height="50"/><rect x="206" y="235" width="180" height="50"/></g>
+          <g class="d-box d-shift"><rect x="226" y="300" width="140" height="30"/></g>
+          <g class="d-box d-out"><rect x="452" y="38" width="44" height="44"/><rect x="452" y="138" width="44" height="44"/><rect x="452" y="238" width="44" height="44"/></g>
+          <g class="d-text">
+            <text x="70" y="65" text-anchor="middle">x</text>
+            <text x="70" y="165" text-anchor="middle">y</text>
+            <text x="70" y="265" text-anchor="middle">z</text>
+            <text x="296" y="58" text-anchor="middle">x -/+ (y &gt;&gt; i)</text>
+            <text x="296" y="76" text-anchor="middle" class="small">barrel shift of y</text>
+            <text x="296" y="158" text-anchor="middle">y +/- (x &gt;&gt; i)</text>
+            <text x="296" y="176" text-anchor="middle" class="small">barrel shift of x</text>
+            <text x="296" y="258" text-anchor="middle">z -/+ atan[i]</text>
+            <text x="296" y="276" text-anchor="middle" class="small">angle table</text>
+            <text x="296" y="320" text-anchor="middle" class="small">8 entry atan table</text>
+            <text x="474" y="65" text-anchor="middle">x'</text>
+            <text x="474" y="165" text-anchor="middle">y'</text>
+            <text x="474" y="265" text-anchor="middle">z'</text>
+          </g>
+        </svg>
+        <figcaption>One micro-rotation. The copper lines cross because each of x and y is corrected by the shifted value of the other. The direction d is the sign of z in rotation mode and the sign of y in vectoring mode. x', y' and z' are written back to the registers on the next clock edge.</figcaption>
+      </figure>
+    </div>
+
+    <div class="table-wrap">
+      <table class="spec" aria-describedby="ops-caption">
+        <caption id="ops-caption">The four operations. Operand A is ui_in[5:0], a signed 6 bit value.</caption>
+        <thead><tr><th scope="col">ui_in[7:6]</th><th scope="col">Operation</th><th scope="col">How to run it</th><th scope="col">uo_out</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>00</code></th><td>Rotate</td><td>A is an angle in units of pi/64 (A = 32 is 90 degrees). Rising edge on START.</td><td>cos in Q1.7. RSEL = 1 shows sin. Saturates at plus 127 and minus 128.</td></tr>
+          <tr><th scope="row"><code>01</code></th><td>Vector</td><td>START with MODE 0 loads x = A. START with MODE 1 loads y = A and runs.</td><td>length times 1.6467 (whole number). RSEL = 1 shows the angle, 128 counts per half turn.</td></tr>
+          <tr><th scope="row"><code>10</code></th><td>Saturating MAC</td><td>START adds A, or 3A when GAIN3 = 1. START with MODE 1 clears.</td><td>8 bit signed accumulator. OVERFLOW marks a clamped add.</td></tr>
+          <tr><th scope="row"><code>11</code></th><td>PRBS and CRC</td><td>MODE 0 free runs a Galois LFSR, START seeds it with 01 and A. MODE 1 with START feeds A to a CRC-8, RSEL = 1 clears it.</td><td>LFSR state, or CRC after a feed.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-h">Measured accuracy</h3>
+    <p class="prose-line">These figures are recomputed in this browser from the simulator every time the page loads, against <code>Math.cos</code>, <code>Math.sin</code> and <code>Math.atan2</code>.</p>
+    <dl class="stats stats-4" id="accuracy">
+      <div><dt>Worst cosine error</dt><dd><span data-fill="errcos">1.73</span> LSB</dd></div>
+      <div><dt>Worst sine error</dt><dd><span data-fill="errsin">1.45</span> LSB</dd></div>
+      <div><dt>Worst length error</dt><dd><span data-fill="errmag">1.07</span> counts</dd></div>
+      <div><dt>Worst angle error, length 8 or more</dt><dd><span data-fill="errang">1.15</span> counts</dd></div>
+    </dl>
+    <p class="hint">One LSB is 1/128, about 0.8 percent of full scale. One angle count is 1.4 degrees. Vectors shorter than 4 units lose precision because the registers hold only 3 fractional bits there, with errors up to about 6 counts.</p>
+  </section>
+
+  <section class="band" id="floorplan" aria-labelledby="fp-title">
+    <div class="band-head">
+      <h2 id="fp-title">Floorplan sketch</h2>
+      <p>The tile is 340 by 160 micrometres. Rectangles below are drawn with area proportional to each module's generic gate count from Yosys. This is a sketch of relative size. It is not a placed and routed layout.</p>
+    </div>
+    <div class="fp-grid">
+      <figure class="floor">
+        <svg id="floor" viewBox="0 0 340 160" role="img" aria-labelledby="floor-title">
+          <title id="floor-title">Relative size of the four Verilog modules inside a 340 by 160 micrometre tile</title>
+        </svg>
+        <figcaption id="floor-caption">Hover or focus a block for its gate count.</figcaption>
+      </figure>
+      <div class="table-wrap">
+        <table class="spec" id="floor-table">
+          <caption>Yosys 0.70, generic gates and flip-flops</caption>
+          <thead><tr><th scope="col">Module</th><th scope="col">Cells</th><th scope="col">Flip-flops</th><th scope="col">Logic</th></tr></thead>
+          <tbody id="floor-rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="hint">Whether the design fits one tile after GF180MCU mapping, placement and routing is unverified until the Tiny Tapeout GDS workflow has run. The cell library is different from the generic one used here, so the real cell count will differ from 835.</p>
+  </section>
+
+  <section class="band" id="pinout" aria-labelledby="po-title">
+    <div class="band-head">
+      <h2 id="po-title">Pinout</h2>
+      <p>The tile has the standard Tiny Tapeout interface. Pin colour follows the live pin state in the workbench. Select a pin for its role.</p>
+    </div>
+    <div class="po-grid">
+      <figure class="chip-fig">
+        <svg id="pinout-svg" viewBox="0 0 520 410" role="group" aria-label="Pinout of the tile, live state"></svg>
+        <figcaption id="pin-info">Select a pin.</figcaption>
+      </figure>
+      <div class="table-wrap">
+        <table class="spec">
+          <caption>Pin roles</caption>
+          <thead><tr><th scope="col">Pin</th><th scope="col">Direction</th><th scope="col">Role</th></tr></thead>
+          <tbody id="pin-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="verification" aria-labelledby="ver-title">
+    <div class="band-head">
+      <h2 id="ver-title">What has been checked, and what has not</h2>
+    </div>
+    <div class="ver-grid">
+      <article class="panel">
+        <h3>Done</h3>
+        <ul class="plain">
+          <li>The Verilog compiles clean under Icarus Verilog 13 with warnings on, and synthesizes in Yosys 0.70.</li>
+          <li>A replay bench runs the Verilog and this page's JavaScript twin through the same stimulus. Every output and every internal register matched after every clock edge for <span data-fill="cosim">320,028</span> cycles, over two random seeds plus directed sweeps of every operation.</li>
+          <li>The comparison was shown to fail when either side is changed by one constant, so a pass means something.</li>
+          <li>Accuracy limits above are asserted by the test suite, not only displayed.</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <h3>Not done</h3>
+        <ul class="plain">
+          <li>No tapeout. No GF180MCU place and route has been run, so the tile fit and the real standard cell count are unknown.</li>
+          <li>No test on an FPGA or with a logic analyzer. The plan is to load the Verilog on an FPGA board, wire ui_in and uio_in to switches, and capture uo_out and uio_out on a logic analyzer while stepping through the four operations in the table above.</li>
+          <li>The Tiny Tapeout GitHub workflows (test, gds, docs, fpga) have not run yet, because the repository has not been pushed. The cocotb tests in <code>test/test.py</code> pass locally under Icarus Verilog, and they check against <code>math</code> rather than the JavaScript twin.</li>
+          <li>No write up has been published. <code>WRITEUP.md</code> only collects measured facts for a person to write from.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Apache-2.0 licensed. Built with AI assistance, as a learning and reference project. It is not a Hack Club ASIC entry, because that program does not allow AI written chip code or write ups.</p>
+  <p><a href="https://github.com/draarivpatel-ui/ttgf-cordic-alu" rel="noopener">Source repository</a>, <a href="https://github.com/draarivpatel-ui/ttgf-cordic-alu/blob/main/WRITEUP.md" rel="noopener">facts for a write up</a>, <a href="https://github.com/draarivpatel-ui/ttgf-cordic-alu/blob/main/docs/info.md" rel="noopener">datasheet text</a>.</p>
+</footer>
+
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
