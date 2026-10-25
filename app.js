@@ -352,13 +352,19 @@
     }
 
     // ---------- waveform ----------
-    function drawWave() {
+    // The canvas is drawn at the width it is shown at, so labels stay readable on a phone
+    // and the number of clock cycles on screen follows the width.
+    const waveWrap = $("wave-wrap");
+        function drawWave() {
       const cv = $("wave");
       if (!cv || !cv.getContext) return;
       const ctx = cv.getContext("2d");
       if (!ctx) return;
       const k = Math.min(2, win.devicePixelRatio || 1);
-      if (cv.width !== LOGICAL_W * k) { cv.width = LOGICAL_W * k; cv.height = LOGICAL_H * k; }
+      const shown = waveWrap && waveWrap.clientWidth ? waveWrap.clientWidth : LOGICAL_W;
+      const WW = Math.max(340, Math.min(LOGICAL_W, shown));
+      const NCYC = Math.max(8, Math.floor((WW - (WW < 600 ? 72 : 92) - 8) / 33));
+      if (cv.width !== WW * k || cv.height !== LOGICAL_H * k) { cv.width = WW * k; cv.height = LOGICAL_H * k; }
       ctx.setTransform(k, 0, 0, k, 0, 0);
       const ink = cssVar("--ink");
       const faint = cssVar("--line-strong");
@@ -367,9 +373,9 @@
       const green = cssVar("--green");
       const paper = cssVar("--paper");
       const mono = cssVar("--font-mono");
-      ctx.clearRect(0, 0, LOGICAL_W, LOGICAL_H);
+      ctx.clearRect(0, 0, WW, LOGICAL_H);
       ctx.fillStyle = paper;
-      ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
+      ctx.fillRect(0, 0, WW, LOGICAL_H);
 
       const lanes = [
         { n: "clk", kind: "clk" },
@@ -383,22 +389,32 @@
         { n: "z_reg", kind: "bus", w: 12, get: (r) => r.z, color: green },
         { n: "iter", kind: "bus", w: 3, get: (r) => r.iter, color: green },
       ];
-      const gutter = 92;
+      const gutter = WW < 600 ? 72 : 92;
       const top = 8;
       const laneH = (LOGICAL_H - top - 22) / lanes.length;
-      const recs = S.history.slice(-WAVE_CYCLES);
-      const cw = (LOGICAL_W - gutter - 8) / WAVE_CYCLES;
-      const x0 = gutter + (WAVE_CYCLES - recs.length) * cw;
+      const recs = S.history.slice(-NCYC);
+      const cw = (WW - gutter - 8) / NCYC;
+      const x0 = gutter + (NCYC - recs.length) * cw;
 
+      const soft = cssVar("--ink-soft");
       ctx.font = `11px ${mono}`;
       ctx.textBaseline = "middle";
+      ctx.lineWidth = 1;
+      // faint cycle grid, one line per clock, so the time axis reads even before data arrives
+      ctx.strokeStyle = faint;
+      ctx.globalAlpha = 0.14;
+      for (let c = 0; c <= NCYC; c++) {
+        const gx = gutter + c * cw;
+        ctx.beginPath(); ctx.moveTo(gx, top); ctx.lineTo(gx, LOGICAL_H - 22); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
       ctx.lineWidth = 1.5;
       lanes.forEach((ln, li) => {
         const yTop = top + li * laneH + 7;
         const yBot = top + (li + 1) * laneH - 7;
         ctx.strokeStyle = faint;
         ctx.globalAlpha = 0.35;
-        ctx.beginPath(); ctx.moveTo(gutter, yBot + 7); ctx.lineTo(LOGICAL_W - 8, yBot + 7); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(gutter, yBot + 7); ctx.lineTo(WW - 8, yBot + 7); ctx.stroke();
         ctx.globalAlpha = 1;
         ctx.fillStyle = ink;
         ctx.textAlign = "right";
@@ -441,8 +457,22 @@
         }
       });
       if (recs.length) {
-        ctx.fillStyle = faint; ctx.textAlign = "center";
+        ctx.fillStyle = soft; ctx.textAlign = "center";
         recs.forEach((r, i) => { if (r.cycle % 8 === 0) ctx.fillText(String(r.cycle), x0 + i * cw + cw / 2, LOGICAL_H - 8); });
+      }
+      ctx.fillStyle = soft; ctx.textAlign = "right";
+      ctx.fillText(WW < 600 ? "cycle" : "clock cycle", gutter - 10, LOGICAL_H - 8);
+      if (recs.length < NCYC - 8) {
+        const msg = "Earlier cycles scroll in from the right as the clock runs";
+        const mx = gutter + (x0 - gutter) / 2;
+        const mw = msg.length * 6.8 + 28;
+        ctx.fillStyle = paper; ctx.globalAlpha = 0.92;
+        ctx.fillRect(mx - mw / 2, LOGICAL_H / 2 - 16, mw, 32);
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = faint; ctx.lineWidth = 1;
+        ctx.strokeRect(mx - mw / 2, LOGICAL_H / 2 - 16, mw, 32);
+        ctx.fillStyle = soft; ctx.textAlign = "center";
+        ctx.fillText(msg, mx, LOGICAL_H / 2);
       }
       cv.setAttribute("aria-label", `Digital waveforms for the last ${recs.length} clock cycles. uo_out is ${hex(currentOutputs().uoOut, 2)}.`);
     }
@@ -582,6 +612,7 @@
       a.setAttribute("href", win.URL.createObjectURL(new win.Blob([vcd], { type: "text/plain" })));
     });
 
+    if (win.addEventListener) win.addEventListener("resize", () => drawWave());
     buildPinout();
     buildFloorplan();
     syncSwitches();

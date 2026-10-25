@@ -48,6 +48,10 @@
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
         <p><strong>Status.</strong> This is an AI assisted reference design. Hack Club ASIC does not accept AI written chip code or write ups, so it is not an eligible entry for that program. It has not been taped out and it has not been run on hardware.</p>
       </div>
+      <div class="btn-row hero-cta">
+        <a class="btn btn-primary" href="#workbench">Open the workbench</a>
+        <a class="btn" href="#datapath">See how the datapath works</a>
+      </div>
       <dl class="stats">
         <div><dt>Generic gates after Yosys</dt><dd><span data-fill="cells">835</span></dd></div>
         <div><dt>Clocks per CORDIC result</dt><dd>8</dd></div>
@@ -61,6 +65,7 @@
         <g class="grid-lines"><line x1="-1.3" y1="0" x2="1.3" y2="0"/><line x1="0" y1="-1.3" x2="0" y2="1.3"/></g>
         <circle class="unit" cx="0" cy="0" r="1"/>
         <circle class="unit-inner" cx="0" cy="0" r="0.6073"/>
+        <g class="ax-labels" transform="scale(0.01)" aria-hidden="true"><text x="138" y="-5" text-anchor="end">0&#176;</text><text x="5" y="-130">90&#176;</text><text x="-138" y="-5">180&#176;</text><text x="5" y="135">270&#176;</text><text class="ring" x="-5" y="-64" text-anchor="end">0.607</text></g>
         <line id="h-target" class="target" x1="0" y1="0" x2="1" y2="0"/>
         <g id="h-trail" class="trail"></g>
         <line id="h-vec" class="vec" x1="0" y1="0" x2="0.6" y2="0"/>
@@ -103,7 +108,7 @@
         <p class="decoded" id="pin-decode">opcode 00 rotate, A = 0</p>
       </section>
 
-      <section class="panel" aria-labelledby="clk-title">
+      <section class="panel panel-clock" aria-labelledby="clk-title">
         <h3 id="clk-title">Clock</h3>
         <div class="btn-row">
           <button type="button" class="btn btn-primary" id="btn-step">Step one clock</button>
@@ -133,12 +138,19 @@
             <g class="grid-lines"><line x1="-1.3" y1="0" x2="1.3" y2="0"/><line x1="0" y1="-1.3" x2="0" y2="1.3"/></g>
             <circle class="unit" cx="0" cy="0" r="1"/>
             <circle class="unit-inner" cx="0" cy="0" r="0.6073"/>
+            <g class="ax-labels" transform="scale(0.01)" aria-hidden="true"><text x="138" y="-5" text-anchor="end">0&#176;</text><text x="5" y="-130">90&#176;</text><text x="-138" y="-5">180&#176;</text><text x="5" y="135">270&#176;</text><text class="ring" x="-5" y="-64" text-anchor="end">0.607</text></g>
             <line id="c-target" class="target" x1="0" y1="0" x2="1" y2="0"/>
             <g id="c-trail" class="trail"></g>
             <line id="c-vec" class="vec" x1="0" y1="0" x2="0.6" y2="0"/>
             <circle id="c-dot" class="dot" cx="0.6" cy="0" r="0.045"/>
           </svg>
           <figcaption id="circle-caption">Idle. Pulse START in rotate or vector mode to see the eight micro-rotations.</figcaption>
+          <ul class="key" aria-label="Chart key">
+            <li><i class="sw sw-vec" aria-hidden="true"></i>Vector now</li>
+            <li><i class="sw sw-trail" aria-hidden="true"></i>Earlier stages</li>
+            <li><i class="sw sw-target" aria-hidden="true"></i>Target angle</li>
+            <li><i class="sw sw-ring" aria-hidden="true"></i>Start length 0.607</li>
+          </ul>
         </figure>
         <ol class="stages" id="stage-list" aria-label="Micro-rotation stages"></ol>
       </section>
@@ -149,7 +161,7 @@
         <h3 id="wave-title">Logic analyzer</h3>
         <a class="btn btn-small" id="btn-vcd" href="#workbench" download="cordic_alu.vcd" role="button">Download VCD</a>
       </div>
-      <div class="wave-wrap" tabindex="0" role="region" aria-label="Logic analyzer waveforms, scrollable"><canvas id="wave" width="1100" height="420" role="img" aria-label="Digital waveforms of clk, rst_n, ui_in, uio_in, uo_out, uio_out, x_reg, y_reg, z_reg and the iteration counter"></canvas></div>
+      <div class="wave-wrap" id="wave-wrap" tabindex="0" role="region" aria-label="Logic analyzer waveforms, scrollable"><canvas id="wave" width="1100" height="420" role="img" aria-label="Digital waveforms of clk, rst_n, ui_in, uio_in, uo_out, uio_out, x_reg, y_reg, z_reg and the iteration counter"></canvas></div>
       <p class="hint" id="wave-caption">The newest clock cycle is on the right. Values are hexadecimal; x_reg and y_reg are 11 bit two's complement, z_reg is 12 bit.</p>
     </section>
 
@@ -238,14 +250,14 @@
     </div>
 
     <div class="table-wrap">
-      <table class="spec" aria-describedby="ops-caption">
+      <table class="spec stack" aria-describedby="ops-caption">
         <caption id="ops-caption">The four operations. Operand A is ui_in[5:0], a signed 6 bit value.</caption>
         <thead><tr><th scope="col">ui_in[7:6]</th><th scope="col">Operation</th><th scope="col">How to run it</th><th scope="col">uo_out</th></tr></thead>
         <tbody>
-          <tr><th scope="row"><code>00</code></th><td>Rotate</td><td>A is a signed angle in units of pi/64, from -32 (minus 90 degrees) to 31 (plus 87.2 degrees). Rising edge on START.</td><td>cos in Q1.7. RSEL = 1 shows sin. Saturates at plus 127 and minus 128.</td></tr>
-          <tr><th scope="row"><code>01</code></th><td>Vector</td><td>START with MODE 0 loads x = A. START with MODE 1 loads y = A and runs.</td><td>length times 1.6467 (whole number). RSEL = 1 shows the angle, 128 counts per half turn.</td></tr>
-          <tr><th scope="row"><code>10</code></th><td>Saturating MAC</td><td>START adds A, or 3A when GAIN3 = 1. START with MODE 1 clears.</td><td>8 bit signed accumulator. OVERFLOW marks a clamped add.</td></tr>
-          <tr><th scope="row"><code>11</code></th><td>PRBS and CRC</td><td>MODE 0 free runs a Galois LFSR, START seeds it with 01 and A. MODE 1 with START feeds A to a CRC-8, RSEL = 1 clears it.</td><td>LFSR state, or CRC after a feed.</td></tr>
+          <tr><th scope="row"><code>00</code></th><td data-label="Operation">Rotate</td><td data-label="How to run it">A is a signed angle in units of pi/64, from -32 (minus 90 degrees) to 31 (plus 87.2 degrees). Rising edge on START.</td><td data-label="uo_out">cos in Q1.7. RSEL = 1 shows sin. Saturates at plus 127 and minus 128.</td></tr>
+          <tr><th scope="row"><code>01</code></th><td data-label="Operation">Vector</td><td data-label="How to run it">START with MODE 0 loads x = A. START with MODE 1 loads y = A and runs.</td><td data-label="uo_out">length times 1.6467 (whole number). RSEL = 1 shows the angle, 128 counts per half turn.</td></tr>
+          <tr><th scope="row"><code>10</code></th><td data-label="Operation">Saturating MAC</td><td data-label="How to run it">START adds A, or 3A when GAIN3 = 1. START with MODE 1 clears.</td><td data-label="uo_out">8 bit signed accumulator. OVERFLOW marks a clamped add.</td></tr>
+          <tr><th scope="row"><code>11</code></th><td data-label="Operation">PRBS and CRC</td><td data-label="How to run it">MODE 0 free runs a Galois LFSR, START seeds it with 01 and A. MODE 1 with START feeds A to a CRC-8, RSEL = 1 clears it.</td><td data-label="uo_out">LFSR state, or CRC after a feed.</td></tr>
         </tbody>
       </table>
     </div>
@@ -271,7 +283,7 @@
         <svg id="floor" viewBox="0 0 340 160" role="img" aria-labelledby="floor-title">
           <title id="floor-title">Relative size of the four Verilog modules inside a 340 by 160 micrometre tile</title>
         </svg>
-        <figcaption id="floor-caption">Hover or focus a block for its gate count.</figcaption>
+        <figcaption id="floor-caption">Hover, tap or focus a block for its gate count.</figcaption>
       </figure>
       <div class="table-wrap">
         <table class="spec" id="floor-table">
@@ -281,7 +293,7 @@
         </table>
       </div>
     </div>
-    <p class="hint">The Tiny Tapeout GDS workflow mapped the design to 894 GF180MCU cells with 19,575 square micrometres of cell area, inside a core of 51,967 square micrometres, so it does fit one tile. The rectangles above use the generic counts from the table, so they show relative size only.</p>
+    <p class="hint fp-note">The Tiny Tapeout GDS workflow mapped the design to 894 GF180MCU cells with 19,575 square micrometres of cell area, inside a core of 51,967 square micrometres, so it does fit one tile. The rectangles above use the generic counts from the table, so they show relative size only.</p>
   </section>
 
   <section class="band" id="pinout" aria-labelledby="po-title">
