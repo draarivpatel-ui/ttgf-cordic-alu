@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 560" width="1040" height="560" role="img" aria-labelledby="dp-title">
+  <title id="dp-title">tt_um_aariv_cordic_alu Top-Level Architecture and Iterative CORDIC Datapath</title>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#131618"/>
+    </marker>
+    <marker id="arr-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#D97706"/>
+    </marker>
+  </defs>
+  <style>
+    .bg { fill: #F6F4EE; }
+    .hdr { fill: #EAE6DC; stroke: #131618; stroke-width: 1; }
+    .box { fill: #EAE6DC; stroke: #131618; stroke-width: 1.5; }
+    .box-cyan { fill: #E1EFF6; stroke: #0284C7; stroke-width: 1.6; }
+    .box-cop { fill: #F6EAE0; stroke: #D97706; stroke-width: 1.6; }
+    .box-grn { fill: #E3EFE2; stroke: #15803D; stroke-width: 1.6; }
+    .box-sub { fill: #F6F4EE; stroke: #131618; stroke-width: 1.2; stroke-dasharray: 4 3; }
+    .wire { fill: none; stroke: #131618; stroke-width: 1.5; }
+    .wire-c { fill: none; stroke: #D97706; stroke-width: 1.5; stroke-dasharray: 5 3; }
+    .title { font: 700 16px "Space Grotesk", "Helvetica Neue", Arial, sans-serif; fill: #131618; }
+    .sub { font: 400 12px "Plus Jakarta Sans", "Helvetica Neue", Arial, sans-serif; fill: #494B4B; }
+    .b-title { font: 700 12.5px "JetBrains Mono", monospace; fill: #131618; }
+    .b-txt { font: 400 11px "JetBrains Mono", monospace; fill: #131618; }
+    .b-dim { font: 400 10px "JetBrains Mono", monospace; fill: #5E605E; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1040" height="560"/>
+  <rect class="hdr" x="1" y="1" width="1038" height="52"/>
+  <text class="title" x="16" y="24">tt_um_aariv_cordic_alu Architecture and 8-Stage Iterative Datapath (835 Generic Cells / 894 GF180MCU Cells)</text>
+  <text class="sub" x="16" y="42">Four shared-pin blocks inside one 340 x 160 um Tiny Tapeout tile: aariv_cordic_core (454), top control/fold (240), aariv_mac8 (92), aariv_prng_crc (49)</text>
+
+  <!-- Input Pins Column -->
+  <rect class="box" x="20" y="74" width="190" height="175" rx="2"/>
+  <text class="b-title" x="32" y="96">Dedicated Inputs</text>
+  <text class="b-txt" x="32" y="118">ui_in[7:6] : opcode (2b)</text>
+  <text class="b-dim" x="42" y="134">00=ROT, 01=VEC, 10=MAC, 11=PRN</text>
+  <text class="b-txt" x="32" y="156">ui_in[5:0] : signed A (6b)</text>
+  <text class="b-dim" x="42" y="172">-32 .. +31 (angle or coord)</text>
+  <text class="b-txt" x="32" y="196">clk, rst_n, ena</text>
+  <text class="b-dim" x="42" y="212">synchronous active-low reset</text>
+
+  <rect class="box-cop" x="20" y="268" width="190" height="150" rx="2"/>
+  <text class="b-title" x="32" y="290">Control Inputs uio_in[3:0]</text>
+  <text class="b-txt" x="32" y="312">uio_in[0] : START (edge)</text>
+  <text class="b-dim" x="42" y="327">start = start_pin &amp; ~start_q</text>
+  <text class="b-txt" x="32" y="347">uio_in[1] : MODE</text>
+  <text class="b-txt" x="32" y="367">uio_in[2] : RSEL (output mux)</text>
+  <text class="b-txt" x="32" y="387">uio_in[3] : GAIN3 (1x / 3x)</text>
+  <text class="b-dim" x="32" y="406">uio_oe = 8&apos;hF0 (low 4 in)</text>
+
+  <!-- Pre-rotation & Latch Block -->
+  <rect class="box-cop" x="250" y="74" width="235" height="175" rx="2"/>
+  <text class="b-title" x="262" y="96">Vector Latch &amp; Quadrant Fold</text>
+  <text class="b-txt" x="262" y="118">xin[5:0] &lt;= a (on ld_vec_x)</text>
+  <text class="b-dim" x="262" y="134">MODE=0 latches X; MODE=1 runs Y</text>
+  <text class="b-txt" x="262" y="156">xa = xin &lt;&lt;&lt; 3, ya = a &lt;&lt;&lt; 3</text>
+  <text class="b-txt" x="262" y="176">v_fold = xin[5] (x &lt; 0)</text>
+  <text class="b-dim" x="262" y="194">If x &lt; 0: pre-rotate +-90 deg</text>
+  <text class="b-dim" x="262" y="210">vx0 = +-ya, vy0 = -+xa</text>
+  <text class="b-dim" x="262" y="226">vz0 = +-512 (+-90 deg in pi/1024)</text>
+
+  <!-- CORDIC Core -->
+  <rect class="box-cyan" x="525" y="74" width="285" height="235" rx="2"/>
+  <text class="b-title" x="537" y="96">aariv_cordic_core (454 cells)</text>
+  <text class="b-dim" x="537" y="113">8 stages (iter = 0..7), 1 micro-rotation/clk</text>
+  <rect class="box-sub" x="537" y="124" width="261" height="62" rx="2"/>
+  <text class="b-txt" x="547" y="142">Registers (39 DFFs total):</text>
+  <text class="b-txt" x="547" y="159">x[10:0], y[10:0] (signed Q2.9)</text>
+  <text class="b-txt" x="547" y="176">z[11:0] (signed pi/1024), iter[2:0]</text>
+
+  <rect class="box-sub" x="537" y="196" width="261" height="102" rx="2"/>
+  <text class="b-txt" x="547" y="214">xs = x &gt;&gt;&gt; iter (signed shift)</text>
+  <text class="b-txt" x="547" y="231">ys = y &gt;&gt;&gt; iter (signed shift)</text>
+  <text class="b-txt" x="547" y="248">dpos = vec_mode ? y[10] : ~z[11]</text>
+  <text class="b-txt" x="547" y="265">xn = x -/+ ys, yn = y +/- xs</text>
+  <text class="b-txt" x="547" y="282">zn = z -/+ atan_q[iter]</text>
+  <text class="b-dim" x="547" y="294">LUT: 256, 151, 80, 41, 20, 10, 5, 3</text>
+
+  <!-- Saturating MAC8 -->
+  <rect class="box-grn" x="250" y="325" width="260" height="96" rx="2"/>
+  <text class="b-title" x="262" y="347">aariv_mac8 (92 cells)</text>
+  <text class="b-txt" x="262" y="367">prod = gain3 ? (a + (a&lt;&lt;1)) : a</text>
+  <text class="b-txt" x="262" y="385">acc[7:0] clamps to [-128, +127]</text>
+  <text class="b-dim" x="262" y="403">Zero hardware multipliers; sat flag</text>
+
+  <!-- PRNG + CRC8 -->
+  <rect class="box" x="530" y="325" width="280" height="96" rx="2"/>
+  <text class="b-title" x="542" y="347">aariv_prng_crc (49 cells)</text>
+  <text class="b-txt" x="542" y="367">Galois LFSR: x^8+x^6+x^5+x^4+1</text>
+  <text class="b-txt" x="542" y="385">CRC-8: poly 0x07 (check = 0xF4)</text>
+  <text class="b-dim" x="542" y="403">BIST 0..63 signature = 0x8E</text>
+
+  <!-- Output Mux & Status Flags -->
+  <rect class="box-grn" x="845" y="74" width="175" height="205" rx="2"/>
+  <text class="b-title" x="857" y="96">Output View Mux</text>
+  <text class="b-txt" x="857" y="118">view[2:0] selects:</text>
+  <text class="b-dim" x="857" y="136">0: rot_out (Q1.7 sat8)</text>
+  <text class="b-dim" x="865" y="150">RSEL=0: cx[10:2] (cos)</text>
+  <text class="b-dim" x="865" y="164">RSEL=1: cy[10:2] (sin)</text>
+  <text class="b-dim" x="857" y="182">1: vec (RSEL ? cz:cx)[10:3]</text>
+  <text class="b-dim" x="857" y="200">2: acc[7:0]</text>
+  <text class="b-dim" x="857" y="218">3: lfsr[7:0]</text>
+  <text class="b-dim" x="857" y="236">4: crc[7:0]</text>
+  <text class="b-txt" x="857" y="260">-&gt; uo_out[7:0]</text>
+
+  <rect class="box-cop" x="845" y="300" width="175" height="121" rx="2"/>
+  <text class="b-title" x="857" y="322">Flags uio_out[7:4]</text>
+  <text class="b-txt" x="857" y="344">[4] BUSY (cbusy)</text>
+  <text class="b-txt" x="857" y="364">[5] ZERO (uo_out==0)</text>
+  <text class="b-txt" x="857" y="384">[6] OVERFLOW (ovf)</text>
+  <text class="b-txt" x="857" y="404">[7] SIGN (uo_out[7])</text>
+
+  <!-- Wires -->
+  <path class="wire" d="M210 155 H250" marker-end="url(#arr)"/>
+  <path class="wire" d="M485 155 H525" marker-end="url(#arr)"/>
+  <path class="wire-c" d="M210 315 H230 V200 H250" marker-end="url(#arr-c)"/>
+  <path class="wire" d="M210 365 H250" marker-end="url(#arr)"/>
+  <path class="wire" d="M810 175 H845" marker-end="url(#arr)"/>
+  <path class="wire" d="M510 375 H520 V260 H830 V200 H845" marker-end="url(#arr)"/>
+  <path class="wire" d="M810 375 H830 V225 H845" marker-end="url(#arr)"/>
+  <path class="wire-c" d="M810 280 H845" marker-end="url(#arr-c)"/>
+
+  <!-- Summary Footer Box -->
+  <rect class="box" x="20" y="445" width="1000" height="95" rx="2"/>
+  <text class="b-title" x="34" y="468">Fixed-Point Scaling &amp; Convergence Summary</text>
+  <text class="b-txt" x="34" y="489">1. Rotation (opcode 00): x0 = 311 = round(512 / 1.6467435), y0 = 0, z0 = A &lt;&lt; 4. After 8 clocks, cx &gt;&gt;&gt; 2 = cos(A*pi/64) and cy &gt;&gt;&gt; 2 = sin(A*pi/64) in Q1.7.</text>
+  <text class="b-txt" x="34" y="508">2. Vectoring (opcode 01): Sum of atan(2^-i) for i=0..7 is 99.78 deg. Pre-rotating x &lt; 0 by +-90 deg folds Quadrants II/III into [-90 deg, +90 deg] for full 360 deg range.</text>
+  <text class="b-txt" x="34" y="527">3. Physical Layout: 894 GF180MCU 7-track standard cells (75 dffq_1), 19,575 um^2 cell area in 51,967 um^2 core (37.7% utilization), 0 DRC errors.</text>
+</svg>

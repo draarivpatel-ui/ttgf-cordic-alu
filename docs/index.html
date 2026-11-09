@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tt_um_aariv_cordic_alu | Technical Reference and Cycle-by-Cycle Waveform Walkthrough</title>
+  <meta name="description" content="Cycle-accurate Icarus Verilog waveform walkthrough and RTL technical reference for tt_um_aariv_cordic_alu on GF180MCU (AI-assisted reference design).">
+  <meta name="theme-color" content="#F6F4EE">
+  <link rel="stylesheet" href="../fonts.css">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<a class="skip" href="#architecture">Skip to technical reference</a>
+
+<header class="bar">
+  <a class="mark" href="../index.html" aria-label="tt_um_aariv_cordic_alu interactive workbench">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+    <span>cordic_alu / docs</span>
+  </a>
+  <nav aria-label="Sections">
+    <a href="#architecture">Architecture</a>
+    <a href="#protocol">Pin Protocol</a>
+    <a href="#wave-rot">Rotation Waveform</a>
+    <a href="#wave-vec">Vectoring Waveform</a>
+    <a href="#rtl-notes">RTL Mechanics</a>
+    <a href="../index.html">Live Workbench</a>
+  </nav>
+  <a class="bar-link" href="https://github.com/draarivpatel-ui/ttgf-cordic-alu" rel="noopener">Source</a>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="doc-title">
+    <div class="hero-copy">
+      <h1 id="doc-title">Technical reference and Icarus Verilog waveform walkthrough.</h1>
+      <p class="lead">This page documents the cycle-by-cycle signal transitions, fixed-point scaling, and RTL architecture of <code>tt_um_aariv_cordic_alu</code> (<code>src/project.v</code>), an 8-stage multiplier-free CORDIC and fixed-point ALU tile synthesized for GlobalFoundries 180 nm (GF180MCU).</p>
+      <div class="notice" id="disclosure" role="note">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <p><strong>Important Disclosure.</strong> Hack Club's "The Basics of ASICs" program strictly forbids using AI to generate chip HDL, tests, or project write-ups. Because this repository and technical reference were generated with AI assistance, this document is not an eligible Hack Club ASIC submission write-up and must not be submitted as human-authored work. It is published as an open technical reference and waveform study guide.</p>
+      </div>
+      <div class="btn-row hero-cta">
+        <a class="btn btn-primary" href="#wave-rot">Inspect Icarus Verilog waveforms</a>
+        <a class="btn" href="../index.html#workbench">Open interactive workbench</a>
+      </div>
+      <dl class="stats">
+        <div><dt>GF180MCU standard cells</dt><dd>894</dd></div>
+        <div><dt>Core area in 1x1 tile</dt><dd>19,575 um^2</dd></div>
+        <div><dt>Clocks per CORDIC op</dt><dd>8</dd></div>
+        <div><dt>Co-sim cycles verified</dt><dd>320,028</dd></div>
+      </dl>
+    </div>
+    <figure class="hero-fig">
+      <img src="datapath_block_diagram.svg" alt="Top-level architecture and 8-stage CORDIC datapath diagram" style="width:100%;height:auto;display:block;">
+      <figcaption>Top-level architecture of <code>tt_um_aariv_cordic_alu</code> showing the four shared-pin blocks inside one 340 x 160 um tile.</figcaption>
+    </figure>
+  </section>
+
+  <section class="band" id="architecture" aria-labelledby="arch-title">
+    <div class="band-head">
+      <h2 id="arch-title">1. Fitting trigonometric and fixed-point math into one 340 x 160 um tile</h2>
+      <p>A single Tiny Tapeout GF180MCU tile provides 51,967 um^2 of routable core area and 24 user signal pins. By replacing parallel array multipliers with an iterative shift-and-add CORDIC core, all four functional units fit in 37.7% of one tile.</p>
+    </div>
+    <figure class="diagram">
+      <img src="datapath_block_diagram.svg" alt="Detailed block diagram of tt_um_aariv_cordic_alu" style="width:100%;height:auto;display:block;">
+      <figcaption>Complete datapath of <code>src/project.v</code>: 2-bit opcode decode, 6-bit signed operand A, <code>xin</code> holding latch, <code>+-90 deg</code> quadrant fold, 8-stage <code>aariv_cordic_core</code>, <code>aariv_mac8</code>, and <code>aariv_prng_crc</code>.</figcaption>
+    </figure>
+    <div class="table-wrap">
+      <table class="spec">
+        <caption>Module breakdown from Yosys 0.70 (generic cells) and LibreLane GF180MCU synthesis (run 40216982627)</caption>
+        <thead><tr><th scope="col">Module</th><th scope="col">Generic Cells</th><th scope="col">Flip-Flops</th><th scope="col">Combinational Logic</th><th scope="col">Role in Datapath</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>aariv_cordic_core</code></th><td class="num">454</td><td class="num">39</td><td class="num">415</td><td>11-bit signed <code>x, y</code> (Q2.9), 12-bit signed <code>z</code> (pi/1024), 3-bit <code>iter</code>, barrel shifters <code>x &gt;&gt;&gt; iter</code> and <code>y &gt;&gt;&gt; iter</code>, 8-entry <code>atan_q</code> LUT</td></tr>
+          <tr><th scope="row"><code>tt_um_aariv_cordic_alu</code> (top)</th><td class="num">240</td><td class="num">11</td><td class="num">229</td><td><code>START</code> edge detector, 6-bit <code>xin</code> latch, <code>v_fold</code> +-90 deg pre-rotation, Q2.9 to Q1.7 output saturation, <code>view[2:0]</code> mux</td></tr>
+          <tr><th scope="row"><code>aariv_mac8</code></th><td class="num">92</td><td class="num">9</td><td class="num">83</td><td>8-bit signed saturating accumulator with 1x (<code>a</code>) or 3x (<code>a + (a &lt;&lt;&lt; 1)</code>) multiplier-free gain</td></tr>
+          <tr><th scope="row"><code>aariv_prng_crc</code></th><td class="num">49</td><td class="num">16</td><td class="num">33</td><td>Maximal-length Galois LFSR (<code>x^8 + x^6 + x^5 + x^4 + 1</code>, period 255) and CRC-8 (poly <code>0x07</code>)</td></tr>
+          <tr><th scope="row"><strong>Total (Generic / GF180MCU)</strong></th><td class="num"><strong>835 / 894</strong></td><td class="num"><strong>75</strong></td><td class="num"><strong>760 / 819</strong></td><td><strong>19,575 um^2 cell area inside 51,967 um^2 core (0 Magic DRC violations)</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="band" id="protocol" aria-labelledby="prot-title">
+    <div class="band-head">
+      <h2 id="prot-title">2. Pin partitioning and two-cycle operand loading</h2>
+      <p>With <code>ui_in[7:6]</code> dedicated to the 2-bit opcode, <code>ui_in[5:0]</code> carries a single signed 6-bit operand <code>A</code> (-32 to +31). Vectoring mode (<code>opcode = 01</code>) needs both <code>x</code> and <code>y</code>, so it uses a two-pulse handshake on <code>START</code> (<code>uio_in[0]</code>) gated by <code>MODE</code> (<code>uio_in[1]</code>).</p>
+    </div>
+    <div class="ver-grid">
+      <article class="panel">
+        <h3>Single-pulse operations (Rotate, MAC, PRNG/CRC)</h3>
+        <ul class="plain">
+          <li><strong>Rotate (<code>op = 00</code>):</strong> Set <code>ui_in[5:0] = A</code> (angle in units of <code>pi/64</code>, from -32 = minus 90 degrees to +31 = plus 87.2 degrees). Pulse <code>START</code> high. On that rising clock edge, <code>go_rot = 1</code> loads <code>x0 = 311</code>, <code>y0 = 0</code>, <code>z0 = A &lt;&lt; 4</code>, and raises <code>BUSY</code> (<code>uio_out[4]</code>) for 8 clocks.</li>
+          <li><strong>Saturating MAC (<code>op = 10</code>):</strong> Pulse <code>START</code> with <code>MODE = 0</code> to add <code>A</code> (or <code>3*A</code> when <code>GAIN3 = 1</code>) into <code>acc[7:0]</code>, clamping at +127 or -128. Pulse <code>START</code> with <code>MODE = 1</code> to clear <code>acc</code>.</li>
+          <li><strong>LFSR and CRC-8 (<code>op = 11</code>):</strong> With <code>MODE = 0</code>, the Galois LFSR steps every clock while idle, or seeds <code>{2'b01, A}</code> on <code>START</code>. With <code>MODE = 1</code>, <code>START</code> feeds <code>{2'b00, A}</code> into the CRC-8 engine (or clears it when <code>RSEL = 1</code>).</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <h3>Two-pulse vectoring handshake (<code>op = 01</code>)</h3>
+        <ul class="plain">
+          <li><strong>Pulse 1 (Latch X, <code>MODE = 0</code>):</strong> Drive <code>ui_in = {2'b01, x[5:0]}</code>, hold <code>MODE = 0</code>, and raise <code>START</code>. At <code>posedge clk</code>, <code>ld_vec_x = start &amp; ~cbusy &amp; op_vec &amp; ~mode</code> pulses high, latching <code>xin &lt;= a</code>. <code>BUSY</code> remains low.</li>
+          <li><strong>Pulse 2 (Load Y and Fold, <code>MODE = 1</code>):</strong> Pull <code>START</code> low for one clock to re-arm the edge detector (<code>start_q &lt;= 0</code>), drive <code>ui_in = {2'b01, y[5:0]}</code>, set <code>MODE = 1</code>, and raise <code>START</code>. At <code>posedge clk</code>, <code>go_vec = 1</code> combines <code>xin</code> and <code>a</code> through the <code>+-90 deg</code> pre-rotation network and asserts <code>BUSY = 1</code> for 8 stages.</li>
+          <li><strong>Result Readout (<code>RSEL</code>):</strong> After 8 clocks, <code>BUSY</code> drops low. With <code>RSEL = 0</code>, <code>uo_out</code> outputs <code>cx[10:3]</code> (scaled length <code>1.6467 * hypot(x, y)</code>). With <code>RSEL = 1</code>, <code>uo_out</code> outputs <code>cz[10:3]</code> (angle in units of <code>pi/128</code>).</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="band" id="wave-rot" aria-labelledby="wrot-title">
+    <div class="band-head">
+      <h2 id="wrot-title">3. Rotation mode waveform walkthrough (<code>A = 10</code>, +28.125 degrees)</h2>
+      <p>Captured directly from Icarus Verilog (<code>iverilog -g2012 src/project.v test/replay.v</code>). Each clock cycle is 10 ns with rising edges at 5 ns, 15 ns, ..., 135 ns.</p>
+    </div>
+    <figure class="diagram">
+      <img src="waveform_sin_cos.svg" alt="Icarus Verilog waveform for CORDIC rotation mode with A = 10" style="width:100%;height:auto;display:block;">
+      <figcaption>Simulated waveform for <code>opcode = 00</code>, <code>A = 10</code> (<code>ui_in = 0x0A</code>). <code>BUSY</code> rises at C3 (35 ns), stays high across the 8 micro-rotations (C3..C10), and falls at C11 (115 ns) with <code>cos = 112</code> (<code>0x70</code>) and <code>sin = 60</code> (<code>0x3C</code>).</figcaption>
+    </figure>
+    <div class="table-wrap">
+      <table class="spec">
+        <caption>Cycle-by-cycle register states from <code>iverilog</code> for Rotation Mode (<code>A = 10</code>, <code>z0 = 160</code>)</caption>
+        <thead><tr><th scope="col">Cycle (Edge)</th><th scope="col"><code>rst_n</code></th><th scope="col"><code>ui_in</code></th><th scope="col"><code>uio_in</code></th><th scope="col"><code>iter</code></th><th scope="col"><code>BUSY</code></th><th scope="col"><code>cx</code> (Q2.9)</th><th scope="col"><code>cy</code> (Q2.9)</th><th scope="col"><code>cz</code> (pi/1024)</th><th scope="col"><code>uo_out</code></th><th scope="col">Signal Transition Explanation</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>C0..C1</code> (5..15ns)</th><td>0</td><td><code>0x00</code></td><td><code>0x00</code></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><code>0x00</code> (0)</td><td>Active-low reset clears all CORDIC registers; <code>uio_out = 0x20</code> (<code>ZERO = 1</code>).</td></tr>
+          <tr><th scope="row"><code>C2</code> (25ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x00</code></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><code>0x00</code> (0)</td><td><code>rst_n</code> rises to 1; <code>ui_in = 0x0A</code> puts <code>op = 00</code> and <code>A = 10</code> on the input bus.</td></tr>
+          <tr><th scope="row"><code>C3</code> (35ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x01</code></td><td>0</td><td>1</td><td>311</td><td>0</td><td>160</td><td><code>0x4D</code> (77)</td><td><code>START</code> rises; <code>go_rot = 1</code> loads <code>x0 = 311</code>, <code>y0 = 0</code>, <code>z0 = 160</code>, and asserts <code>BUSY = 1</code>.</td></tr>
+          <tr><th scope="row"><code>C4</code> (45ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x00</code></td><td>1</td><td>1</td><td>311</td><td>311</td><td>-96</td><td><code>0x4D</code> (77)</td><td>Stage 0: <code>z = 160 &gt;= 0</code> (CCW +45 deg). <code>x &lt;= 311</code>, <code>y &lt;= 311</code>, <code>z &lt;= 160 - 256 = -96</code>.</td></tr>
+          <tr><th scope="row"><code>C5</code> (55ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x00</code></td><td>2</td><td>1</td><td>466</td><td>156</td><td>55</td><td><code>0x74</code> (116)</td><td>Stage 1: <code>z = -96 &lt; 0</code> (CW -26.5 deg). <code>x &lt;= 311 + 155 = 466</code>, <code>y &lt;= 311 - 155 = 156</code>, <code>z &lt;= -96 + 151 = 55</code>.</td></tr>
+          <tr><th scope="row"><code>C6</code> (65ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x00</code></td><td>3</td><td>1</td><td>427</td><td>272</td><td>-25</td><td><code>0x6A</code> (106)</td><td>Stage 2: <code>z = 55 &gt;= 0</code> (CCW +14.1 deg). <code>x &lt;= 466 - 39 = 427</code>, <code>y &lt;= 156 + 116 = 272</code>, <code>z &lt;= 55 - 80 = -25</code>.</td></tr>
+          <tr><th scope="row"><code>C7</code> (75ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x00</code></td><td>4</td><td>1</td><td>461</td><td>219</td><td>16</td><td><code>0x73</code> (115)</td><td>Stage 3: <code>z = -25 &lt; 0</code> (CW -7.2 deg). <code>x &lt;= 427 + 34 = 461</code>, <code>y &lt;= 272 - 53 = 219</code>, <code>z &lt;= -25 + 41 = 16</code>.</td></tr>
+          <tr><th scope="row"><code>C8</code> (85ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x00</code></td><td>5</td><td>1</td><td>448</td><td>247</td><td>-4</td><td><code>0x70</code> (112)</td><td>Stage 4: <code>z = 16 &gt;= 0</code> (CCW +3.5 deg). <code>x &lt;= 461 - 13 = 448</code>, <code>y &lt;= 219 + 28 = 247</code>, <code>z &lt;= 16 - 20 = -4</code>.</td></tr>
+          <tr><th scope="row"><code>C9</code> (95ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x00</code></td><td>6</td><td>1</td><td>455</td><td>233</td><td>6</td><td><code>0x71</code> (113)</td><td>Stage 5: <code>z = -4 &lt; 0</code> (CW -1.8 deg). <code>x &lt;= 448 + 7 = 455</code>, <code>y &lt;= 247 - 14 = 233</code>, <code>z &lt;= -4 + 10 = 6</code>.</td></tr>
+          <tr><th scope="row"><code>C10</code> (105ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x00</code></td><td>7</td><td>1</td><td>452</td><td>240</td><td>1</td><td><code>0x71</code> (113)</td><td>Stage 6: <code>z = 6 &gt;= 0</code> (CCW +0.9 deg). <code>x &lt;= 455 - 3 = 452</code>, <code>y &lt;= 233 + 7 = 240</code>, <code>z &lt;= 6 - 5 = 1</code>.</td></tr>
+          <tr><th scope="row"><code>C11</code> (115ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x00</code></td><td>0</td><td>0</td><td>451</td><td>243</td><td>-2</td><td><code>0x70</code> (112)</td><td>Stage 7 finishes; <code>BUSY</code> drops to 0. <code>RSEL = 0</code> shows <code>cos = 451 &gt;&gt; 2 = 112</code> (0.8750 vs exact 0.8819).</td></tr>
+          <tr><th scope="row"><code>C12</code> (125ns)</th><td>1</td><td><code>0x0A</code></td><td><code>0x04</code></td><td>0</td><td>0</td><td>451</td><td>243</td><td>-2</td><td><code>0x3C</code> (60)</td><td><code>RSEL = 1</code> selects <code>sin = 243 &gt;&gt; 2 = 60</code> (0.46875 vs exact 0.4714).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="band" id="wave-vec" aria-labelledby="wvec-title">
+    <div class="band-head">
+      <h2 id="wvec-title">4. Vectoring mode waveform walkthrough (<code>x = -10, y = +10</code>, +135 degrees)</h2>
+      <p>Demonstrates the two-pulse <code>START</code> load protocol and the left-half-plane <code>+90 deg</code> pre-rotation fold for Quadrant II input <code>(-10, +10)</code>.</p>
+    </div>
+    <figure class="diagram">
+      <img src="waveform_atan2.svg" alt="Icarus Verilog waveform for CORDIC vectoring mode with x = -10, y = +10" style="width:100%;height:auto;display:block;">
+      <figcaption>Simulated waveform for <code>opcode = 01</code>, <code>(x, y) = (-10, +10)</code>. C2 latches <code>xin = -10</code> with <code>MODE = 0</code>; C4 folds <code>(-10, +10)</code> to <code>(80, 80)</code> with <code>vz0 = 512</code> (+90 deg) and runs 8 stages until C12.</figcaption>
+    </figure>
+    <div class="table-wrap">
+      <table class="spec">
+        <caption>Cycle-by-cycle register states from <code>iverilog</code> for Vectoring Mode (<code>x = -10, y = +10</code>)</caption>
+        <thead><tr><th scope="col">Cycle (Edge)</th><th scope="col"><code>ui_in</code></th><th scope="col"><code>uio_in</code></th><th scope="col"><code>iter</code></th><th scope="col"><code>BUSY</code></th><th scope="col"><code>cx</code></th><th scope="col"><code>cy</code></th><th scope="col"><code>cz</code> (pi/1024)</th><th scope="col"><code>uo_out</code></th><th scope="col">Signal Transition Explanation</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>C1</code> (15ns)</th><td><code>0x76</code></td><td><code>0x00</code></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><code>0x00</code> (0)</td><td><code>rst_n = 1</code>; <code>ui_in = 0x76</code> presents <code>op = 01</code> and <code>A = -10</code> (<code>6'b110110</code>).</td></tr>
+          <tr><th scope="row"><code>C2</code> (25ns)</th><td><code>0x76</code></td><td><code>0x01</code></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><code>0x00</code> (0)</td><td>Pulse 1 (<code>START = 1, MODE = 0</code>): <code>ld_vec_x = 1</code> latches <code>xin &lt;= -10</code>; <code>BUSY</code> stays 0.</td></tr>
+          <tr><th scope="row"><code>C3</code> (35ns)</th><td><code>0x4A</code></td><td><code>0x02</code></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><code>0x00</code> (0)</td><td><code>START</code> drops to 0; <code>MODE = 1</code>; <code>ui_in = 0x4A</code> presents <code>op = 01</code> and <code>A = +10</code>.</td></tr>
+          <tr><th scope="row"><code>C4</code> (45ns)</th><td><code>0x4A</code></td><td><code>0x03</code></td><td>0</td><td>1</td><td>80</td><td>80</td><td>512</td><td><code>0x0A</code> (10)</td><td>Pulse 2 (<code>START = 1, MODE = 1</code>): <code>v_fold = 1</code> folds <code>(-10, +10)</code> to <code>vx0 = 80, vy0 = 80, vz0 = 512</code> (+90 deg); <code>BUSY &lt;= 1</code>.</td></tr>
+          <tr><th scope="row"><code>C5</code> (55ns)</th><td><code>0x4A</code></td><td><code>0x02</code></td><td>1</td><td>1</td><td>160</td><td>0</td><td>768</td><td><code>0x14</code> (20)</td><td>Stage 0: <code>y = 80 &gt;= 0</code> (CW -45 deg). <code>x &lt;= 80 + 80 = 160</code>, <code>y &lt;= 80 - 80 = 0</code>, <code>z &lt;= 512 + 256 = 768</code> (135 deg).</td></tr>
+          <tr><th scope="row"><code>C6..C11</code></th><td><code>0x4A</code></td><td><code>0x02</code></td><td>2..7</td><td>1</td><td>160..189</td><td>-80..0</td><td>919..763</td><td><code>0x14..0x17</code></td><td>Stages 1..6 drive residual <code>cy</code> back to 0 while <code>cx</code> grows to 189 and <code>cz</code> converges near 766.</td></tr>
+          <tr><th scope="row"><code>C12</code> (125ns)</th><td><code>0x4A</code></td><td><code>0x02</code></td><td>0</td><td>0</td><td>189</td><td>-1</td><td>766</td><td><code>0x17</code> (23)</td><td>Stage 7 completes; <code>BUSY</code> drops to 0. <code>RSEL = 0</code> outputs scaled length <code>189 &gt;&gt; 3 = 23</code> (vs exact 23.29).</td></tr>
+          <tr><th scope="row"><code>C13</code> (135ns)</th><td><code>0x4A</code></td><td><code>0x06</code></td><td>0</td><td>0</td><td>189</td><td>-1</td><td>766</td><td><code>0x5F</code> (95)</td><td><code>RSEL = 1</code> outputs angle <code>766 &gt;&gt; 3 = 95</code> counts (133.6 deg vs exact 135.0 deg = 96 counts).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="band" id="rtl-notes" aria-labelledby="rtl-title">
+    <div class="band-head">
+      <h2 id="rtl-title">5. Key RTL mechanics and hardware verification notes</h2>
+    </div>
+    <div class="wb-grid">
+      <article class="panel">
+        <h3>Arithmetic vs logical shift (<code>&gt;&gt;&gt;</code>)</h3>
+        <p>In Verilog-2005, <code>&gt;&gt;</code> always zero-fills the upper bits even on signed registers. In <code>aariv_cordic_core</code>, <code>x</code> and <code>y</code> are declared <code>reg signed [10:0]</code> and shifted with <code>wire signed [10:0] ys = y &gt;&gt;&gt; iter;</code>. During cycle C7 of the vectoring trace, <code>cy = -80</code> (<code>11'h7B0</code>) shifts right by 2 to produce <code>-20</code> (<code>11'h7EC</code>) instead of <code>+492</code>, preserving two's complement sign extension across all quadrants.</p>
+      </article>
+      <article class="panel">
+        <h3>Quadrant folding at +-90 degrees</h3>
+        <p>The sum of the 8-entry arctangent table is <code>256 + 151 + 80 + 41 + 20 + 10 + 5 + 3 = 566</code> units of <code>pi/1024</code>, or 99.49 degrees. Without pre-rotation, vectors in Quadrants II and III with angles beyond +-99.49 degrees fail to converge. Inspecting <code>v_fold = xin[5]</code> rotates any <code>x &lt; 0</code> input by +-90 degrees into the right half-plane before stage 0 begins.</p>
+      </article>
+      <article class="panel">
+        <h3>Time-multiplexed area savings</h3>
+        <p>Unrolling 8 CORDIC stages combinationally requires 24 multi-bit adders in series. Reusing one iterative stage across 8 clock cycles with a 3-bit counter (<code>iter</code>) and an 8-entry LUT reduces <code>aariv_cordic_core</code> to 454 generic cells, letting the CORDIC core, MAC, LFSR, and CRC-8 route cleanly in 894 GF180MCU cells (37.7% of one tile) with 0 DRC errors.</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Apache-2.0 licensed. Built with AI assistance as a learning and reference project. It is not a Hack Club ASIC entry, because that program does not allow AI written chip code or write ups.</p>
+  <p><a href="../index.html">Interactive workbench</a>, <a href="https://github.com/draarivpatel-ui/ttgf-cordic-alu" rel="noopener">Source repository</a>, <a href="https://github.com/draarivpatel-ui/ttgf-cordic-alu/blob/main/WRITEUP.md" rel="noopener">WRITEUP.md</a>.</p>
+</footer>
+</body>
+</html>

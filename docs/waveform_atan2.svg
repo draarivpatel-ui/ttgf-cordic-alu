@@ -1,0 +1,301 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1175 628" width="1175" height="628" role="img" aria-labelledby="svg-title">
+  <title id="svg-title">Icarus Verilog Waveform: CORDIC Vectoring Mode (Opcode 01, x = -10, y = +10, Quadrant II)</title>
+  <style>
+    .bg { fill: #F6F4EE; }
+    .hdr { fill: #EAE6DC; stroke: #131618; stroke-width: 1; }
+    .grid { stroke: #DCD7CA; stroke-width: 1; }
+    .edge { stroke: #C8C1B2; stroke-width: 1; stroke-dasharray: 3 3; }
+    .row-line { stroke: #E2DDD0; stroke-width: 1; }
+    .title { font: 700 16px "Space Grotesk", "Helvetica Neue", Arial, sans-serif; fill: #131618; }
+    .sub { font: 400 12px "Plus Jakarta Sans", "Helvetica Neue", Arial, sans-serif; fill: #494B4B; }
+    .sig { font: 600 12px "JetBrains Mono", monospace; fill: #131618; }
+    .sig-sub { font: 400 10px "JetBrains Mono", monospace; fill: #5E605E; }
+    .cyc { font: 600 11px "JetBrains Mono", monospace; fill: #131618; text-anchor: middle; }
+    .tns { font: 400 10px "JetBrains Mono", monospace; fill: #5E605E; text-anchor: middle; }
+    .bit { fill: none; stroke: #15803D; stroke-width: 2.2; stroke-linejoin: round; }
+    .bit-ctrl { fill: none; stroke: #D97706; stroke-width: 2.2; stroke-linejoin: round; }
+    .bit-busy { fill: none; stroke: #0284C7; stroke-width: 2.4; stroke-linejoin: round; }
+    .bus-box { fill: #EAE6DC; stroke: #131618; stroke-width: 1.4; }
+    .bus-active { fill: #E1EFF6; stroke: #0284C7; stroke-width: 1.5; }
+    .bus-done { fill: #E3EFE2; stroke: #15803D; stroke-width: 1.5; }
+    .bus-txt { font: 600 10.5px "JetBrains Mono", monospace; fill: #131618; text-anchor: middle; }
+    .note { font: 600 10.5px "JetBrains Mono", monospace; fill: #91530A; }
+    .busy-shade { fill: #0284C7; opacity: 0.07; }
+  </style>
+  <rect class="bg" x="0" y="0" width="1175" height="628"/>
+  <rect class="hdr" x="1" y="1" width="1173" height="52"/>
+  <text class="title" x="16" y="24">Icarus Verilog Waveform: CORDIC Vectoring Mode (Opcode 01, x = -10, y = +10, Quadrant II)</text>
+  <text class="sub" x="16" y="42">Two-pulse operand load (MODE=0 latches xin=-10, MODE=1 loads y=+10 with +90 deg pre-rotation)</text>
+  <rect class="busy-shade" x="501" y="58" width="544" height="486"/>
+  <line class="grid" x1="195" y1="56" x2="195" y2="544"/>
+  <line class="edge" x1="229" y1="80" x2="229" y2="544"/>
+  <text class="cyc" x="229" y="70">C0</text>
+  <text class="tns" x="229" y="82">5ns</text>
+  <line class="grid" x1="263" y1="56" x2="263" y2="544"/>
+  <line class="edge" x1="297" y1="80" x2="297" y2="544"/>
+  <text class="cyc" x="297" y="70">C1</text>
+  <text class="tns" x="297" y="82">15ns</text>
+  <line class="grid" x1="331" y1="56" x2="331" y2="544"/>
+  <line class="edge" x1="365" y1="80" x2="365" y2="544"/>
+  <text class="cyc" x="365" y="70">C2</text>
+  <text class="tns" x="365" y="82">25ns</text>
+  <line class="grid" x1="399" y1="56" x2="399" y2="544"/>
+  <line class="edge" x1="433" y1="80" x2="433" y2="544"/>
+  <text class="cyc" x="433" y="70">C3</text>
+  <text class="tns" x="433" y="82">35ns</text>
+  <line class="grid" x1="467" y1="56" x2="467" y2="544"/>
+  <line class="edge" x1="501" y1="80" x2="501" y2="544"/>
+  <text class="cyc" x="501" y="70">C4</text>
+  <text class="tns" x="501" y="82">45ns</text>
+  <line class="grid" x1="535" y1="56" x2="535" y2="544"/>
+  <line class="edge" x1="569" y1="80" x2="569" y2="544"/>
+  <text class="cyc" x="569" y="70">C5</text>
+  <text class="tns" x="569" y="82">55ns</text>
+  <line class="grid" x1="603" y1="56" x2="603" y2="544"/>
+  <line class="edge" x1="637" y1="80" x2="637" y2="544"/>
+  <text class="cyc" x="637" y="70">C6</text>
+  <text class="tns" x="637" y="82">65ns</text>
+  <line class="grid" x1="671" y1="56" x2="671" y2="544"/>
+  <line class="edge" x1="705" y1="80" x2="705" y2="544"/>
+  <text class="cyc" x="705" y="70">C7</text>
+  <text class="tns" x="705" y="82">75ns</text>
+  <line class="grid" x1="739" y1="56" x2="739" y2="544"/>
+  <line class="edge" x1="773" y1="80" x2="773" y2="544"/>
+  <text class="cyc" x="773" y="70">C8</text>
+  <text class="tns" x="773" y="82">85ns</text>
+  <line class="grid" x1="807" y1="56" x2="807" y2="544"/>
+  <line class="edge" x1="841" y1="80" x2="841" y2="544"/>
+  <text class="cyc" x="841" y="70">C9</text>
+  <text class="tns" x="841" y="82">95ns</text>
+  <line class="grid" x1="875" y1="56" x2="875" y2="544"/>
+  <line class="edge" x1="909" y1="80" x2="909" y2="544"/>
+  <text class="cyc" x="909" y="70">C10</text>
+  <text class="tns" x="909" y="82">105ns</text>
+  <line class="grid" x1="943" y1="56" x2="943" y2="544"/>
+  <line class="edge" x1="977" y1="80" x2="977" y2="544"/>
+  <text class="cyc" x="977" y="70">C11</text>
+  <text class="tns" x="977" y="82">115ns</text>
+  <line class="grid" x1="1011" y1="56" x2="1011" y2="544"/>
+  <line class="edge" x1="1045" y1="80" x2="1045" y2="544"/>
+  <text class="cyc" x="1045" y="70">C12</text>
+  <text class="tns" x="1045" y="82">125ns</text>
+  <line class="grid" x1="1079" y1="56" x2="1079" y2="544"/>
+  <line class="edge" x1="1113" y1="80" x2="1113" y2="544"/>
+  <text class="cyc" x="1113" y="70">C13</text>
+  <text class="tns" x="1113" y="82">135ns</text>
+  <line class="grid" x1="1147" y1="56" x2="1147" y2="544"/>
+  <line class="row-line" x1="12" y1="126" x2="1163" y2="126"/>
+  <text class="sig" x="14" y="105">clk</text>
+  <text class="sig-sub" x="14" y="118">100 MHz sim clock</text>
+  <path class="bit" d="M195,118 L229,118 L229,96 L263,96 L263,118 L263,118 L297,118 L297,96 L331,96 L331,118 L331,118 L365,118 L365,96 L399,96 L399,118 L399,118 L433,118 L433,96 L467,96 L467,118 L467,118 L501,118 L501,96 L535,96 L535,118 L535,118 L569,118 L569,96 L603,96 L603,118 L603,118 L637,118 L637,96 L671,96 L671,118 L671,118 L705,118 L705,96 L739,96 L739,118 L739,118 L773,118 L773,96 L807,96 L807,118 L807,118 L841,118 L841,96 L875,96 L875,118 L875,118 L909,118 L909,96 L943,96 L943,118 L943,118 L977,118 L977,96 L1011,96 L1011,118 L1011,118 L1045,118 L1045,96 L1079,96 L1079,118 L1079,118 L1113,118 L1113,96 L1147,96 L1147,118"/>
+  <line class="row-line" x1="12" y1="164" x2="1163" y2="164"/>
+  <text class="sig" x="14" y="143">rst_n</text>
+  <text class="sig-sub" x="14" y="156">active-low reset</text>
+  <path class="bit" d="M195,156 L263,156 L263,156 L263,134 L331,134 L331,134 L331,134 L399,134 L399,134 L399,134 L467,134 L467,134 L467,134 L535,134 L535,134 L535,134 L603,134 L603,134 L603,134 L671,134 L671,134 L671,134 L739,134 L739,134 L739,134 L807,134 L807,134 L807,134 L875,134 L875,134 L875,134 L943,134 L943,134 L943,134 L1011,134 L1011,134 L1011,134 L1079,134 L1079,134 L1079,134 L1147,134"/>
+  <line class="row-line" x1="12" y1="202" x2="1163" y2="202"/>
+  <text class="sig" x="14" y="181">ui_in[7:0]</text>
+  <text class="sig-sub" x="14" y="194">0x76 (-10), 0x4A (+10)</text>
+  <rect class="bus-box" x="196.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="229" y="187">0x00</text>
+  <rect class="bus-box" x="264.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="297" y="187">0x76</text>
+  <rect class="bus-box" x="332.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="365" y="187">0x76</text>
+  <rect class="bus-box" x="400.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="433" y="187">0x4a</text>
+  <rect class="bus-box" x="468.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="501" y="187">0x4a</text>
+  <rect class="bus-box" x="536.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="569" y="187">0x4a</text>
+  <rect class="bus-box" x="604.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="637" y="187">0x4a</text>
+  <rect class="bus-box" x="672.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="705" y="187">0x4a</text>
+  <rect class="bus-box" x="740.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="773" y="187">0x4a</text>
+  <rect class="bus-box" x="808.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="841" y="187">0x4a</text>
+  <rect class="bus-box" x="876.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="909" y="187">0x4a</text>
+  <rect class="bus-box" x="944.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="977" y="187">0x4a</text>
+  <rect class="bus-box" x="1012.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1045" y="187">0x4a</text>
+  <rect class="bus-box" x="1080.5" y="172" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1113" y="187">0x4a</text>
+  <line class="row-line" x1="12" y1="240" x2="1163" y2="240"/>
+  <text class="sig" x="14" y="219">uio_in[0] START</text>
+  <text class="sig-sub" x="14" y="232">2 rising pulses</text>
+  <path class="bit-ctrl" d="M195,232 L263,232 L263,232 L263,232 L331,232 L331,232 L331,210 L399,210 L399,210 L399,232 L467,232 L467,232 L467,210 L535,210 L535,210 L535,232 L603,232 L603,232 L603,232 L671,232 L671,232 L671,232 L739,232 L739,232 L739,232 L807,232 L807,232 L807,232 L875,232 L875,232 L875,232 L943,232 L943,232 L943,232 L1011,232 L1011,232 L1011,232 L1079,232 L1079,232 L1079,232 L1147,232"/>
+  <line class="row-line" x1="12" y1="278" x2="1163" y2="278"/>
+  <text class="sig" x="14" y="257">uio_in[1] MODE</text>
+  <text class="sig-sub" x="14" y="270">0=latch x, 1=run y</text>
+  <path class="bit-ctrl" d="M195,270 L263,270 L263,270 L263,270 L331,270 L331,270 L331,270 L399,270 L399,270 L399,248 L467,248 L467,248 L467,248 L535,248 L535,248 L535,248 L603,248 L603,248 L603,248 L671,248 L671,248 L671,248 L739,248 L739,248 L739,248 L807,248 L807,248 L807,248 L875,248 L875,248 L875,248 L943,248 L943,248 L943,248 L1011,248 L1011,248 L1011,248 L1079,248 L1079,248 L1079,248 L1147,248"/>
+  <line class="row-line" x1="12" y1="316" x2="1163" y2="316"/>
+  <text class="sig" x="14" y="295">uio_in[2] RSEL</text>
+  <text class="sig-sub" x="14" y="308">0=mag, 1=angle</text>
+  <path class="bit-ctrl" d="M195,308 L263,308 L263,308 L263,308 L331,308 L331,308 L331,308 L399,308 L399,308 L399,308 L467,308 L467,308 L467,308 L535,308 L535,308 L535,308 L603,308 L603,308 L603,308 L671,308 L671,308 L671,308 L739,308 L739,308 L739,308 L807,308 L807,308 L807,308 L875,308 L875,308 L875,308 L943,308 L943,308 L943,308 L1011,308 L1011,308 L1011,308 L1079,308 L1079,308 L1079,286 L1147,286"/>
+  <line class="row-line" x1="12" y1="354" x2="1163" y2="354"/>
+  <text class="sig" x="14" y="333">uio_out[4] BUSY</text>
+  <text class="sig-sub" x="14" y="346">high C4..C11</text>
+  <path class="bit-busy" d="M195,346 L263,346 L297,346 L297,346 L331,346 L365,346 L365,346 L399,346 L433,346 L433,346 L467,346 L501,346 L501,324 L535,324 L569,324 L569,324 L603,324 L637,324 L637,324 L671,324 L705,324 L705,324 L739,324 L773,324 L773,324 L807,324 L841,324 L841,324 L875,324 L909,324 L909,324 L943,324 L977,324 L977,324 L1011,324 L1045,324 L1045,346 L1079,346 L1113,346 L1113,346 L1147,346"/>
+  <line class="row-line" x1="12" y1="392" x2="1163" y2="392"/>
+  <text class="sig" x="14" y="371">citer[2:0]</text>
+  <text class="sig-sub" x="14" y="384">stage i = 0..7</text>
+  <rect class="bus-box" x="230.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="263" y="377">0</text>
+  <rect class="bus-box" x="298.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="331" y="377">0</text>
+  <rect class="bus-box" x="366.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="399" y="377">0</text>
+  <rect class="bus-box" x="434.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="467" y="377">0</text>
+  <rect class="bus-active" x="502.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="535" y="377">0</text>
+  <rect class="bus-active" x="570.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="603" y="377">1</text>
+  <rect class="bus-active" x="638.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="671" y="377">2</text>
+  <rect class="bus-active" x="706.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="739" y="377">3</text>
+  <rect class="bus-active" x="774.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="807" y="377">4</text>
+  <rect class="bus-active" x="842.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="875" y="377">5</text>
+  <rect class="bus-active" x="910.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="943" y="377">6</text>
+  <rect class="bus-active" x="978.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1011" y="377">7</text>
+  <rect class="bus-box" x="1046.5" y="362" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1079" y="377">0</text>
+  <rect class="bus-box" x="1114.5" y="362" width="31" height="22" rx="2"/>
+  <text class="bus-txt" x="1130" y="377">0</text>
+  <line class="row-line" x1="12" y1="430" x2="1163" y2="430"/>
+  <text class="sig" x="14" y="409">cx[10:0] (mag*8)</text>
+  <text class="sig-sub" x="14" y="422">vx0=80 -> 189</text>
+  <rect class="bus-box" x="230.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="263" y="415">0</text>
+  <rect class="bus-box" x="298.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="331" y="415">0</text>
+  <rect class="bus-box" x="366.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="399" y="415">0</text>
+  <rect class="bus-box" x="434.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="467" y="415">0</text>
+  <rect class="bus-active" x="502.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="535" y="415">80</text>
+  <rect class="bus-active" x="570.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="603" y="415">160</text>
+  <rect class="bus-active" x="638.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="671" y="415">160</text>
+  <rect class="bus-active" x="706.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="739" y="415">180</text>
+  <rect class="bus-active" x="774.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="807" y="415">185</text>
+  <rect class="bus-active" x="842.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="875" y="415">187</text>
+  <rect class="bus-active" x="910.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="943" y="415">188</text>
+  <rect class="bus-active" x="978.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1011" y="415">189</text>
+  <rect class="bus-done" x="1046.5" y="400" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1079" y="415">189</text>
+  <rect class="bus-done" x="1114.5" y="400" width="31" height="22" rx="2"/>
+  <text class="bus-txt" x="1130" y="415">189</text>
+  <line class="row-line" x1="12" y1="468" x2="1163" y2="468"/>
+  <text class="sig" x="14" y="447">cy[10:0] (resid)</text>
+  <text class="sig-sub" x="14" y="460">vy0=80 -> -1</text>
+  <rect class="bus-box" x="230.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="263" y="453">0</text>
+  <rect class="bus-box" x="298.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="331" y="453">0</text>
+  <rect class="bus-box" x="366.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="399" y="453">0</text>
+  <rect class="bus-box" x="434.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="467" y="453">0</text>
+  <rect class="bus-active" x="502.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="535" y="453">80</text>
+  <rect class="bus-active" x="570.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="603" y="453">0</text>
+  <rect class="bus-active" x="638.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="671" y="453">-80</text>
+  <rect class="bus-active" x="706.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="739" y="453">-40</text>
+  <rect class="bus-active" x="774.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="807" y="453">-18</text>
+  <rect class="bus-active" x="842.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="875" y="453">-7</text>
+  <rect class="bus-active" x="910.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="943" y="453">-2</text>
+  <rect class="bus-active" x="978.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1011" y="453">0</text>
+  <rect class="bus-box" x="1046.5" y="438" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1079" y="453">-1</text>
+  <rect class="bus-box" x="1114.5" y="438" width="31" height="22" rx="2"/>
+  <text class="bus-txt" x="1130" y="453">-1</text>
+  <line class="row-line" x1="12" y1="506" x2="1163" y2="506"/>
+  <text class="sig" x="14" y="485">cz[11:0] (angle)</text>
+  <text class="sig-sub" x="14" y="498">vz0=512 -> 766</text>
+  <rect class="bus-box" x="230.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="263" y="491">0</text>
+  <rect class="bus-box" x="298.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="331" y="491">0</text>
+  <rect class="bus-box" x="366.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="399" y="491">0</text>
+  <rect class="bus-box" x="434.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="467" y="491">0</text>
+  <rect class="bus-active" x="502.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="535" y="491">512</text>
+  <rect class="bus-active" x="570.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="603" y="491">768</text>
+  <rect class="bus-active" x="638.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="671" y="491">919</text>
+  <rect class="bus-active" x="706.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="739" y="491">839</text>
+  <rect class="bus-active" x="774.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="807" y="491">798</text>
+  <rect class="bus-active" x="842.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="875" y="491">778</text>
+  <rect class="bus-active" x="910.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="943" y="491">768</text>
+  <rect class="bus-active" x="978.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1011" y="491">763</text>
+  <rect class="bus-done" x="1046.5" y="476" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1079" y="491">766</text>
+  <rect class="bus-done" x="1114.5" y="476" width="31" height="22" rx="2"/>
+  <text class="bus-txt" x="1130" y="491">766</text>
+  <line class="row-line" x1="12" y1="544" x2="1163" y2="544"/>
+  <text class="sig" x="14" y="523">uo_out[7:0]</text>
+  <text class="sig-sub" x="14" y="536">mag=23, ang=95</text>
+  <rect class="bus-box" x="196.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="229" y="529">0 (0x00)</text>
+  <rect class="bus-box" x="264.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="297" y="529">0 (0x00)</text>
+  <rect class="bus-box" x="332.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="365" y="529">0 (0x00)</text>
+  <rect class="bus-box" x="400.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="433" y="529">0 (0x00)</text>
+  <rect class="bus-box" x="468.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="501" y="529">10 (0x0a)</text>
+  <rect class="bus-box" x="536.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="569" y="529">20 (0x14)</text>
+  <rect class="bus-box" x="604.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="637" y="529">20 (0x14)</text>
+  <rect class="bus-box" x="672.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="705" y="529">22 (0x16)</text>
+  <rect class="bus-box" x="740.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="773" y="529">23 (0x17)</text>
+  <rect class="bus-box" x="808.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="841" y="529">23 (0x17)</text>
+  <rect class="bus-box" x="876.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="909" y="529">23 (0x17)</text>
+  <rect class="bus-box" x="944.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="977" y="529">23 (0x17)</text>
+  <rect class="bus-done" x="1012.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1045" y="529">23 (0x17)</text>
+  <rect class="bus-done" x="1080.5" y="514" width="65" height="22" rx="2"/>
+  <text class="bus-txt" x="1113" y="529">95 (0x5f)</text>
+  <text class="note" x="16" y="566">C2 (25ns): START=1 with MODE=0 latches xin = -10 (0x36); BUSY stays 0.</text>
+  <text class="note" x="16" y="584">C4 (45ns): START=1 with MODE=1 folds (-10, +10) by -90 deg into Quadrant I: vx0=+80, vy0=+80, vz0=+512 (+90 deg).</text>
+  <text class="note" x="16" y="602">C5..C12 (55..125ns): Vectoring drives cy toward 0 (80 -> 0 -> -80 -> -40 -> -18 -> -7 -> -2 -> 0 -> -1); cx reaches 189, cz reaches 766.</text>
+  <text class="note" x="16" y="620">C12 (125ns): RSEL=0 outputs scaled length 189>>3 = 23 (vs 1.6467*14.14 = 23.29). C13 (135ns): RSEL=1 outputs angle 766>>3 = 95 (133.6 deg vs 135 deg).</text>
+</svg>
