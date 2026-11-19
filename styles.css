@@ -34,7 +34,6 @@
   --space-lg: 24px;
   --space-xl: 40px;
   --space-2xl: 72px;
-  --space-3xl: 112px;
 
   --text-sm: 0.8125rem;
   --text-base: 1rem;
@@ -46,9 +45,7 @@
   --radius: 2px;
   --rule: 1px;
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --ease-in-out: cubic-bezier(0.6, 0, 0.3, 1);
   --dur-fast: 120ms;
-  --dur-med: 220ms;
   --max: 1200px;
 }
 
