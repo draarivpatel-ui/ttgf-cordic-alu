@@ -14,7 +14,6 @@
 })(typeof self !== "undefined" ? self : this, function (E) {
   "use strict";
 
-  const WAVE_CYCLES = 30;
   const HISTORY_MAX = 4000;
   const LOGICAL_W = 1100;
   const LOGICAL_H = 420;
