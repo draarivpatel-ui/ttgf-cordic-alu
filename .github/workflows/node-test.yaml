@@ -1,0 +1,25 @@
+name: node-test
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  node-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      # tests/cosim.test.js skips itself without iverilog and vvp, so install them
+      - name: Install iverilog
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y iverilog
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Run unit, co-simulation and page smoke tests
+        run: npm test
